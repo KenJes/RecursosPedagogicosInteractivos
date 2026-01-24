@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root{--green:#006341;--gold:#B8860B;--light:#00875A;--dark:#004d2e}
         body{background:linear-gradient(135deg,#f5f7fa,#c3cfe2);font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;min-height:100vh;padding:20px 0}
@@ -154,10 +155,10 @@
                 </div>
                 <div class="card-body">
                     <div class="alert alert-info mb-3">
-                        <i class="bi bi-info-circle"></i> Puedes subir archivos .txt con los temarios o escribir las unidades manualmente abajo
+                        <i class="bi bi-info-circle"></i> Puedes subir archivos .txt o .pdf con los temarios o escribir las unidades manualmente abajo
                     </div>
-                    <input type="file" class="form-control" id="files" accept=".txt" multiple>
-                    <small class="form-text">Máximo: 2-3 páginas por archivo</small>
+                    <input type="file" class="form-control" id="files" accept=".txt,.pdf" multiple>
+                    <small class="form-text">Máximo: 2-3 páginas por archivo (TXT o PDF)</small>
                 </div>
             </div>
 
@@ -195,6 +196,11 @@
     <script>
         let materiaID = 0, viajeID = 0, AI = true, TOKEN = localStorage.getItem('token') || '', FILES = [];
 
+        // Configurar PDF.js
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
         if (TOKEN) document.getElementById('token').value = TOKEN;
 
         document.getElementById('iaToggle').addEventListener('change', e => {
@@ -216,17 +222,45 @@
 
         document.getElementById('files').addEventListener('change', e => {
             FILES = [];
-            Array.from(e.target.files).forEach(f => {
-                const r = new FileReader();
-                r.onload = ev => {
-                    const c = ev.target.result;
-                    if (c.length > 2500) {
-                        alert('Archivo muy grande: ' + f.name);
-                        return;
+            Array.from(e.target.files).forEach(async f => {
+                if (f.type === 'text/plain') {
+                    // Procesar archivo TXT
+                    const r = new FileReader();
+                    r.onload = ev => {
+                        const c = ev.target.result;
+                        if (c.length > 2500) {
+                            alert('Archivo muy grande: ' + f.name);
+                            return;
+                        }
+                        FILES.push({ nombre: f.name, contenido: c });
+                    };
+                    r.readAsText(f);
+                } else if (f.type === 'application/pdf') {
+                    // Procesar archivo PDF
+                    try {
+                        const arrayBuffer = await f.arrayBuffer();
+                        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                        let texto = '';
+                        
+                        // Extraer texto de todas las páginas
+                        for (let i = 1; i <= Math.min(pdf.numPages, 3); i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            const pageText = content.items.map(item => item.str).join(' ');
+                            texto += pageText + '\n';
+                        }
+                        
+                        if (texto.length > 2500) {
+                            texto = texto.substring(0, 2500);
+                            console.log('PDF recortado a 2500 caracteres');
+                        }
+                        
+                        FILES.push({ nombre: f.name, contenido: texto });
+                        console.log('PDF procesado:', f.name, texto.length, 'caracteres');
+                    } catch (error) {
+                        alert('Error al procesar PDF: ' + f.name + ' - ' + error.message);
                     }
-                    FILES.push({ nombre: f.name, contenido: c });
-                };
-                r.readAsText(f);
+                }
             });
         });
 
