@@ -627,7 +627,7 @@
                 }
             });
 
-            p += `\n\nDevuelve JSON exacto:\n{\n  "materias": [\n    {\n      "nombre": "...",\n      "sesiones": [\n        {\n          "numero": 1,\n          "fecha": "YYYY-MM-DD",\n          "unidadTema": "...",\n          "conocimientos": "...",\n          "estrategiasEnsenanza": "...",\n          "estrategiasAprendizaje": "...",\n          "tecnicas": "...",\n          "recursos": "...",\n          "evidencias": "..."\n        }\n      ]\n    }\n  ]\n}\n\nIMPORTANTE: Genera TODAS las sesiones según horarios. NO omitas sesiones.`;
+            p += `\n\nDevuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin explicaciones, sin código adicional).\nFormato exacto:\n{\n  "materias": [\n    {\n      "nombre": "Nombre de la materia",\n      "sesiones": [\n        {\n          "numero": 1,\n          "fecha": "YYYY-MM-DD",\n          "unidadTema": "Texto corto",\n          "conocimientos": "Texto corto",\n          "estrategiasEnsenanza": "Texto corto",\n          "estrategiasAprendizaje": "Texto corto",\n          "tecnicas": "Texto corto",\n          "recursos": "Texto corto",\n          "evidencias": "Texto corto"\n        }\n      ]\n    }\n  ]\n}\n\nREGLAS CRÍTICAS:\n1. SOLO devuelve el JSON, nada más\n2. NO uses saltos de línea dentro de los valores de texto\n3. Escapa correctamente comillas dobles con \\\"\n4. Genera TODAS las sesiones según horarios\n5. Mantén los textos breves (máximo 150 caracteres por campo)`;
 
             const r = await fetch('https://models.inference.ai.azure.com/chat/completions', {
                 method: 'POST',
@@ -647,22 +647,40 @@
 
             let c = d.choices[0].message.content.trim();
             
-            // Remover markdown code blocks si existen
-            c = c.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+            // Remover markdown code blocks y texto adicional
+            c = c.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
+            c = c.replace(/^[^{]*/, ''); // Remover texto antes del primer {
+            c = c.replace(/[^}]*$/, ''); // Remover texto después del último }
             
-            // Intentar encontrar el JSON en la respuesta
+            // Encontrar el JSON principal
             let jsonMatch = c.match(/\{[\s\S]*\}/);
             if (!jsonMatch) {
                 console.error('Respuesta de IA:', c);
                 throw new Error('No se encontró JSON en la respuesta de la IA');
             }
 
+            let jsonStr = jsonMatch[0];
+            
+            // Limpiar el JSON
+            // Remover saltos de línea problemáticos dentro de strings
+            jsonStr = jsonStr.replace(/"([^"]*?)\n([^"]*?)"/g, (match, p1, p2) => {
+                return `"${p1} ${p2}"`; // Reemplazar saltos de línea con espacios
+            });
+            
+            // Remover comas finales antes de ] o }
+            jsonStr = jsonStr.replace(/,\s*([\]}])/g, '$1');
+
             try {
-                return JSON.parse(jsonMatch[0]);
+                const parsed = JSON.parse(jsonStr);
+                console.log('JSON parseado exitosamente');
+                return parsed;
             } catch (parseError) {
                 console.error('Error al parsear JSON:', parseError);
-                console.error('JSON encontrado:', jsonMatch[0]);
-                throw new Error('JSON inválido en respuesta de IA: ' + parseError.message);
+                console.error('JSON problemático (primeros 500 chars):', jsonStr.substring(0, 500));
+                
+                // Último intento: usar modo de generación básica
+                console.warn('Usando modo básico debido a error de JSON');
+                return genBasico(datos);
             }
         }
 
