@@ -359,6 +359,11 @@
         }
 
         function addHorario(id) {
+            const container = document.getElementById(`horarios-${id}`);
+            if (!container) {
+                console.error(`No se encontró el contenedor horarios-${id}`);
+                return;
+            }
             const d = document.createElement('div');
             d.className = 'card mb-2';
             d.innerHTML = `
@@ -392,7 +397,7 @@
                     </div>
                 </div>
             `;
-            document.getElementById(`horarios-${id}`).appendChild(d);
+            container.appendChild(d);
         }
 
         function addUnidad(id) {
@@ -647,11 +652,25 @@
             const d = await r.json();
             if (!d.choices?.[0]?.message) throw new Error('Respuesta inválida');
 
-            const c = d.choices[0].message.content.trim();
-            const j = c.match(/\{[\s\S]*\}/);
-            if (!j) throw new Error('No se encontró JSON');
+            let c = d.choices[0].message.content.trim();
+            
+            // Remover markdown code blocks si existen
+            c = c.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+            
+            // Intentar encontrar el JSON en la respuesta
+            let jsonMatch = c.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) {
+                console.error('Respuesta de IA:', c);
+                throw new Error('No se encontró JSON en la respuesta de la IA');
+            }
 
-            return JSON.parse(j[0]);
+            try {
+                return JSON.parse(jsonMatch[0]);
+            } catch (parseError) {
+                console.error('Error al parsear JSON:', parseError);
+                console.error('JSON encontrado:', jsonMatch[0]);
+                throw new Error('JSON inválido en respuesta de IA: ' + parseError.message);
+            }
         }
 
         function genBasico(datos) {
