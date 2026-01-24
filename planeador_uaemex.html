@@ -136,6 +136,30 @@
                 </div>
             </div>
 
+            <!-- Horarios de Clase -->
+            <div class="card">
+                <div class="card-header bg-green text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar3"></i> Horarios de Clase</h5>
+                </div>
+                <div class="card-body">
+                    <div id="horarios" class="mb-3"></div>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="addHorario()">
+                        <i class="bi bi-plus-circle"></i> Agregar Horario
+                    </button>
+                </div>
+            </div>
+            <!-- Horarios de Clase -->
+            <div class="card">
+                <div class="card-header bg-green text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar3"></i> Horarios de Clase</h5>
+                </div>
+                <div class="card-body">
+                    <div id="horarios" class="mb-3"></div>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="addHorario()">
+                        <i class="bi bi-plus-circle"></i> Agregar Horario
+                    </button>
+                </div>
+            </div>
             <!-- Viajes de Práctica -->
             <div class="card">
                 <div class="card-header bg-green text-white">
@@ -174,16 +198,27 @@
                 </div>
             </div>
 
-            <!-- Materias -->
+            <!-- Información de la Materia -->
             <div class="card">
                 <div class="card-header bg-green text-white">
-                    <h5 class="mb-0"><i class="bi bi-book"></i> Unidades de Aprendizaje</h5>
+                    <h5 class="mb-0"><i class="bi bi-book"></i> Información de la Materia</h5>
                 </div>
                 <div class="card-body">
-                    <div id="materias"></div>
-                    <button type="button" class="btn btn-outline-success" onclick="addMateria()">
-                        <i class="bi bi-plus-circle"></i> Agregar Materia
-                    </button>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Competencias</label>
+                        <textarea class="form-control" id="competencias" rows="2" placeholder="Competencias a desarrollar"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Objetivo general</label>
+                        <textarea class="form-control" id="objetivo" rows="2" placeholder="Opcional"></textarea>
+                    </div>
+                    <div class="border-top pt-3 mt-3">
+                        <h6 class="mb-2"><i class="bi bi-list-ol"></i> Unidades</h6>
+                        <div id="unidades" class="mb-3"></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addUnidad()">
+                            <i class="bi bi-plus-circle"></i> Agregar Unidad
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -206,7 +241,7 @@
     </div>
 
     <script>
-        let materiaID = 0, viajeID = 0, AI = true, TOKEN = localStorage.getItem('token') || '', FILES = [];
+        let viajeID = 0, AI = true, TOKEN = localStorage.getItem('token') || '', FILES = [];
 
         // Configurar PDF.js
         if (typeof pdfjsLib !== 'undefined') {
@@ -314,54 +349,12 @@
             fileList.appendChild(badge);
         }
 
-        function addMateria() {
-            materiaID++;
-            const d = document.createElement('div');
-            d.className = 'card mb-3';
-            d.innerHTML = `
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-3">
-                        <h5><i class="bi bi-book"></i> Materia ${materiaID}</h5>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.card').remove()">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nombre de la materia</label>
-                        <input type="text" class="form-control materia-nombre" placeholder="Ej: Business Intelligence" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Competencias</label>
-                        <textarea class="form-control materia-competencias" rows="2" placeholder="Competencias a desarrollar"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Objetivo general</label>
-                        <textarea class="form-control materia-objetivo" rows="2" placeholder="Opcional"></textarea>
-                    </div>
-                    <div class="border-top pt-3 mt-3">
-                        <h6 class="mb-2"><i class="bi bi-list-ol"></i> Unidades</h6>
-                        <div id="unidades-${materiaID}" class="mb-3"></div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addUnidad(${materiaID})">
-                            <i class="bi bi-plus-circle"></i> Agregar Unidad
-                        </button>
-                    </div>
-                    <div class="border-top pt-3 mt-3">
-                        <h6 class="mb-2"><i class="bi bi-calendar3"></i> Horarios de clase</h6>
-                        <div id="horarios-${materiaID}" class="mb-3"></div>
-                        <button type="button" class="btn btn-outline-success btn-sm" onclick="addHorario(${materiaID})">
-                            <i class="bi bi-plus-circle"></i> Agregar Horario
-                        </button>
-                    </div>
-                </div>
-            `;
-            document.getElementById('materias').appendChild(d);
-            addHorario(materiaID);
-        }
 
-        function addHorario(id) {
-            const container = document.getElementById(`horarios-${id}`);
+
+        function addHorario() {
+            const container = document.getElementById('horarios');
             if (!container) {
-                console.error(`No se encontró el contenedor horarios-${id}`);
+                console.error('No se encontró el contenedor de horarios');
                 return;
             }
             const d = document.createElement('div');
@@ -400,15 +393,15 @@
             container.appendChild(d);
         }
 
-        function addUnidad(id) {
-            const cont = document.getElementById(`unidades-${id}`);
+        function addUnidad() {
+            const cont = document.getElementById('unidades');
             const d = document.createElement('div');
             d.className = 'card mb-2 unidad-item';
             d.innerHTML = `
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between mb-2">
                         <h6 class="mb-0"><i class="bi bi-bookmark-fill"></i> Unidad ${cont.children.length + 1}</h6>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.card').remove(); renumUnidades(${id})">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.card').remove(); renumUnidades()">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -429,8 +422,8 @@
             cont.appendChild(d);
         }
 
-        function renumUnidades(id) {
-            const c = document.getElementById(`unidades-${id}`);
+        function renumUnidades() {
+            const c = document.getElementById('unidades');
             Array.from(c.children).forEach((u, i) => {
                 u.querySelector('h6').innerHTML = `<i class="bi bi-bookmark-fill"></i> Unidad ${i + 1}`;
             });
@@ -561,31 +554,31 @@
                 });
             }
 
-            // Materias
-            document.querySelectorAll('#materias > .card').forEach(m => {
-                const horarios = [];
-                m.querySelectorAll('.horario-dia').forEach((sel, idx) => {
-                    const dia = sel.value;
-                    const ini = m.querySelectorAll('.horario-inicio')[idx]?.value;
-                    const fin = m.querySelectorAll('.horario-fin')[idx]?.value;
-                    if (dia && ini && fin) horarios.push({ dia, inicio: ini, fin });
-                });
+            // Horarios (de la sección principal)
+            const horarios = [];
+            document.querySelectorAll('#horarios .horario-dia').forEach((sel, idx) => {
+                const dia = sel.value;
+                const ini = document.querySelectorAll('#horarios .horario-inicio')[idx]?.value;
+                const fin = document.querySelectorAll('#horarios .horario-fin')[idx]?.value;
+                if (dia && ini && fin) horarios.push({ dia, inicio: ini, fin });
+            });
 
-                const unidades = [];
-                m.querySelectorAll('.unidad-item').forEach(u => {
-                    const nom = u.querySelector('.unidad-nombre')?.value;
-                    const obj = u.querySelector('.unidad-objetivo')?.value;
-                    const con = u.querySelector('.unidad-contenido')?.value;
-                    if (nom || obj || con) unidades.push({ nombre: nom, objetivo: obj, contenido: con });
-                });
+            // Unidades (de la sección de materia)
+            const unidades = [];
+            document.querySelectorAll('#unidades .unidad-item').forEach(u => {
+                const nom = u.querySelector('.unidad-nombre')?.value;
+                const obj = u.querySelector('.unidad-objetivo')?.value;
+                const con = u.querySelector('.unidad-contenido')?.value;
+                if (nom || obj || con) unidades.push({ nombre: nom, objetivo: obj, contenido: con });
+            });
 
-                datos.materias.push({
-                    nombre: m.querySelector('.materia-nombre').value,
-                    competencias: m.querySelector('.materia-competencias').value,
-                    objetivo: m.querySelector('.materia-objetivo').value,
-                    horarios,
-                    unidades
-                });
+            // Una sola materia
+            datos.materias.push({
+                nombre: datos.ua, // Usar el nombre de la UA como nombre de la materia
+                competencias: document.getElementById('competencias').value,
+                objetivo: document.getElementById('objetivo').value,
+                horarios,
+                unidades
             });
 
             try {
