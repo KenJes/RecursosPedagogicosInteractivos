@@ -1175,62 +1175,44 @@ async function generarPDF(datos, planeacion) {
     const pw = doc.internal.pageSize.getWidth();
     const ph = doc.internal.pageSize.getHeight();
     
-    // PORTADA SEGÚN FORMATO OFICIAL
+    // PORTADA SIMPLIFICADA
     let y = 30;
     doc.setFontSize(12);
     doc.setTextColor(0);
     doc.setFont(undefined, 'bold');
     doc.text('UNIVERSIDAD AUTÓNOMA DEL ESTADO DE MÉXICO', pw/2, y, {align:'center'});
     y += 7;
-    doc.text(`CENTRO UNIVERSITARIO UAEM ${datos.plantel.toUpperCase().replace('CENTRO UNIVERSITARIO UAEM ', '')}`, pw/2, y, {align:'center'});
+    doc.text(`CENTRO UNIVERSITARIO UAEM TEMASCALTEPEC`, pw/2, y, {align:'center'});
     y += 7;
     doc.text(`LICENCIATURA EN ${datos.licenciatura.toUpperCase()}`, pw/2, y, {align:'center'});
     y += 10;
     doc.setFontSize(14);
     doc.text('Planeación Docente', pw/2, y, {align:'center'});
-    y += 20;
+    y += 25;
     
-    // Tabla de información de la materia
-    const portadaData = [
-        ['NOMBRE DE LA UNIDAD DE APRENDIZAJE: ' + (datos.materias[0]?.nombre.toUpperCase() || '')],
-        ['Programa Educativo: ' + datos.programaEducativo, 'Área de Curricular: ' + datos.areaCurricular],
-        ['Clave', 'Horas de teoría', 'Horas de práctica', 'Total de horas', 'Créditos'],
-        [datos.clave, datos.horasTeoria, datos.horasPractica, datos.totalHoras, datos.creditos],
-        ['Tipo de Unidad de Aprendizaje', 'Carácter de la Unidad de Aprendizaje', 'Núcleo de formación', 'Modalidad'],
-        [datos.tipoUnidad, datos.caracter, datos.nucleoFormacion, datos.modalidad],
-        ['Prerrequisitos\n(Conocimientos Previos)', 'Unidad de Aprendizaje Antecedente', 'Unidad de Aprendizaje Consecuente'],
-        [datos.prerrequisitos || 'NINGUNO', datos.unidadAntecedente, datos.unidadConsecuente],
-        ['Fecha de elaboración:', 'Planeación elaborada por:', 'Fecha de Aprobación:'],
-        [
-            datos.fechaElaboracion.toLocaleDateString('es-MX', {day: '2-digit', month: 'long', year: 'numeric'}).toUpperCase(),
-            datos.docente,
-            datos.fechaAprobacion.toLocaleDateString('es-MX', {day: '2-digit', month: 'long', year: 'numeric'}).toUpperCase()
-        ]
-    ];
-    
-    doc.autoTable({
-        startY: y,
-        body: portadaData,
-        theme: 'grid',
-        styles: {
-            fontSize: 8,
-            cellPadding: 2,
-            lineWidth: 0.5,
-            lineColor: [0, 0, 0],
-            halign: 'center',
-            valign: 'middle'
-        },
-        columnStyles: {
-            0: { fontStyle: 'bold', fillColor: [220, 220, 220] }
-        },
-        margin: { left: 10, right: 10 }
-    });
+    // Información básica
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'normal');
+    doc.text(`Unidad de Aprendizaje: ${datos.materias[0]?.nombre || ''}`, 20, y);
+    y += 10;
+    doc.text(`Docente: ${datos.docente}`, 20, y);
+    y += 10;
+    doc.text(`Semestre: ${datos.semestre}`, 20, y);
     
     // PÁGINAS DE CONTENIDO POR UNIDAD
     const materia = datos.materias[0];
     const materiaPlan = planeacion.materias[0];
     
-    if (materia.unidades && materia.unidades.length > 0) {
+    console.log('Materia:', materia);
+    console.log('Planeación:', materiaPlan);
+    console.log('Sesiones totales:', materiaPlan?.sesiones?.length);
+    
+    if (materia.unidades && materia.unidades.length > 0 && materiaPlan?.sesiones) {
+        // Calcular sesiones por unidad
+        const totalSesiones = materiaPlan.sesiones.length;
+        const numUnidades = materia.unidades.length;
+        const sesionesXUnidad = Math.ceil(totalSesiones / numUnidades);
+        
         materia.unidades.forEach((unidad, unidadIdx) => {
             doc.addPage();
             
@@ -1262,11 +1244,12 @@ async function generarPDF(datos, planeacion) {
                 margin: { left: 10, right: 10 }
             });
             
-            // Tabla de sesiones con el formato de la imagen
-            const sesionesUnidad = materiaPlan.sesiones?.filter(s => {
-                // Filtrar sesiones de esta unidad
-                return s.unidadTema && s.unidadTema.includes(`Unidad ${unidadIdx + 1}`);
-            }) || [];
+            // Obtener sesiones para esta unidad
+            const inicioIdx = unidadIdx * sesionesXUnidad;
+            const finIdx = Math.min((unidadIdx + 1) * sesionesXUnidad, totalSesiones);
+            const sesionesUnidad = materiaPlan.sesiones.slice(inicioIdx, finIdx);
+            
+            console.log(`Unidad ${unidadIdx + 1}: sesiones ${inicioIdx} a ${finIdx}`, sesionesUnidad.length);
             
             // Agregar exámenes y viajes en las fechas correspondientes
             const filasTabla = [];
@@ -1278,11 +1261,11 @@ async function generarPDF(datos, planeacion) {
                 if (esFechaDeExamen(fechaSesion, datos)) {
                     const tipoExamen = getTipoExamen(fechaSesion, datos);
                     filasTabla.push([
-                        `Sesión\n${sesion.fecha}`,
+                        `Examen\n${sesion.fecha}`,
                         tipoExamen,
                         'EVALUACIÓN',
                         'EVALUACIÓN',
-                        '',
+                        'ANALÍTICO',
                         'EXAMEN ESCRITO',
                         'EXAMEN'
                     ]);
@@ -1296,11 +1279,11 @@ async function generarPDF(datos, planeacion) {
                 
                 if (viajeEnFecha) {
                     filasTabla.push([
-                        `Viaje\n${sesion.fecha}`,
+                        `Viaje\n${viajeEnFecha.fechaSalida ? new Date(viajeEnFecha.fechaSalida).toLocaleDateString('es-MX') : sesion.fecha}`,
                         `VIAJE DE PRÁCTICA\nDestino: ${viajeEnFecha.destino}`,
                         viajeEnFecha.objetivo || '',
-                        viajeEnFecha.actividades || '',
-                        'VISITA GUIADA',
+                        viajeEnFecha.actividades || 'VISITA GUIADA',
+                        'OBSERVACIÓN DIRECTA',
                         'TRANSPORTE, MATERIALES DE CAMPO',
                         'REPORTE DE VISITA'
                     ]);
@@ -1308,13 +1291,13 @@ async function generarPDF(datos, planeacion) {
                 
                 // Sesión normal
                 filasTabla.push([
-                    `Sesión ${idx + 1}\n${sesion.fecha}`,
+                    `Sesión ${inicioIdx + idx + 1}\n${sesion.fecha}`,
                     sesion.conocimientos || sesion.tema || '',
                     sesion.estrategiasEnsenanza || 'EXPOSICIÓN POR EL PROFESOR',
                     sesion.estrategiasAprendizaje || 'VISUAL, AUDITIVO Y KINESTÉSICO',
                     sesion.tecnicas || 'Elaborar un resumen y un mapa mental, y/o conceptual y/o cuadro sinóptico',
-                    sesion.recursos || 'AULA DE CLASES, HOJAS, LAPICERO, PROYECTOR, BIBLIOGRAFÍA, LEYES Y REGLAMENTOS RELACIONADOS CON EL TEMA',
-                    sesion.evidencias || 'Resumen y un mapa mental, y/o conceptual y/o cuadro sinóptico'
+                    sesion.recursos || 'AULA DE CLASES, HOJAS, LAPICERO, PROYECTOR, BIBLIOGRAFÍA',
+                    sesion.evidencias || 'Resumen y un mapa mental'
                 ]);
             });
             
@@ -1388,12 +1371,81 @@ async function generarPDF(datos, planeacion) {
                 }
             }
         });
+    } else {
+        // Si no hay unidades definidas, generar todo en una página
+        doc.addPage();
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'bold');
+        doc.text('I. PLANEACIÓN DE CONTENIDOS POR SESIÓN.', 14, 15);
+        
+        const filasTabla = [];
+        
+        if (materiaPlan?.sesiones) {
+            materiaPlan.sesiones.forEach((sesion, idx) => {
+                filasTabla.push([
+                    `Sesión ${idx + 1}\n${sesion.fecha}`,
+                    sesion.conocimientos || sesion.tema || '',
+                    sesion.estrategiasEnsenanza || 'EXPOSICIÓN POR EL PROFESOR',
+                    sesion.estrategiasAprendizaje || 'VISUAL, AUDITIVO Y KINESTÉSICO',
+                    sesion.tecnicas || 'Elaborar un resumen y un mapa mental',
+                    sesion.recursos || 'AULA DE CLASES, PROYECTOR',
+                    sesion.evidencias || 'Resumen'
+                ]);
+            });
+        }
+        
+        doc.autoTable({
+            startY: 25,
+            head: [[
+                'N° SESIÓN Y\nFECHA',
+                'CONOCIMIENTOS',
+                { content: 'ESTRATEGIAS ENSEÑANZA-APRENDIZAJE', colSpan: 2 },
+                'Técnicas para el Aprendizaje',
+                'Recursos Didácticos',
+                'Evidencias / Productos'
+            ], [
+                '',
+                '',
+                'Estrategias de Enseñanza',
+                'Estrategias de Aprendizaje',
+                '',
+                '',
+                ''
+            ]],
+            body: filasTabla,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [100, 100, 100],
+                textColor: [255, 255, 255],
+                fontSize: 7,
+                fontStyle: 'bold',
+                halign: 'center',
+                valign: 'middle'
+            },
+            bodyStyles: {
+                fontSize: 7,
+                cellPadding: 2,
+                valign: 'top'
+            },
+            columnStyles: {
+                0: { cellWidth: 22, halign: 'center' },
+                1: { cellWidth: 35, halign: 'left' },
+                2: { cellWidth: 28, halign: 'left' },
+                3: { cellWidth: 28, halign: 'left' },
+                4: { cellWidth: 25, halign: 'left' },
+                5: { cellWidth: 30, halign: 'left' },
+                6: { cellWidth: 25, halign: 'left' }
+            },
+            margin: { left: 10, right: 10 }
+        });
     }
     
     const nombreArchivo = `Planeacion_${datos.materias[0]?.nombre.replace(/\s+/g, '_')}_${datos.semestre}.pdf`;
     doc.save(nombreArchivo);
 }
 
+// Funciones auxiliares para exámenes
+function esFechaDeExamen(fecha, datos) {
 // Funciones auxiliares para exámenes
 function esFechaDeExamen(fecha, datos) {
     const f = new Date(fecha);
