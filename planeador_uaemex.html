@@ -148,18 +148,7 @@
                     </button>
                 </div>
             </div>
-            <!-- Horarios de Clase -->
-            <div class="card">
-                <div class="card-header bg-green text-white">
-                    <h5 class="mb-0"><i class="bi bi-calendar3"></i> Horarios de Clase</h5>
-                </div>
-                <div class="card-body">
-                    <div id="horarios" class="mb-3"></div>
-                    <button type="button" class="btn btn-outline-success btn-sm" onclick="addHorario()">
-                        <i class="bi bi-plus-circle"></i> Agregar Horario
-                    </button>
-                </div>
-            </div>
+
             <!-- Viajes de Práctica -->
             <div class="card">
                 <div class="card-header bg-green text-white">
@@ -205,15 +194,18 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Competencias</label>
-                        <textarea class="form-control" id="competencias" rows="2" placeholder="Competencias a desarrollar"></textarea>
+                        <label class="form-label fw-bold">Objetivos del área curricular o disciplinaria</label>
+                        <textarea class="form-control" id="competencias" rows="2" placeholder="Objetivos del área curricular o disciplinaria"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Objetivo general</label>
-                        <textarea class="form-control" id="objetivo" rows="2" placeholder="Opcional"></textarea>
+                        <label class="form-label fw-bold">Objetivos de la unidad de aprendizaje</label>
+                        <textarea class="form-control" id="objetivo" rows="2" placeholder="Objetivos de la unidad de aprendizaje"></textarea>
                     </div>
                     <div class="border-top pt-3 mt-3">
-                        <h6 class="mb-2"><i class="bi bi-list-ol"></i> Unidades</h6>
+                        <h6 class="mb-2"><i class="bi bi-list-ol"></i> Unidades (Opcional si subiste temario)</h6>
+                        <div class="alert alert-info small mb-2">
+                            <i class="bi bi-info-circle"></i> Si subiste un archivo con el temario arriba, puedes dejar esta sección vacía
+                        </div>
                         <div id="unidades" class="mb-3"></div>
                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="addUnidad()">
                             <i class="bi bi-plus-circle"></i> Agregar Unidad
