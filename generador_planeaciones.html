@@ -94,144 +94,27 @@
                 </div>
             </div>
 
-            <!-- Información Institucional -->
+            <!-- Información Básica -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-gradient text-white">
-                    <h5 class="mb-0"><i class="bi bi-building"></i> Información Institucional</h5>
+                    <h5 class="mb-0"><i class="bi bi-person-circle"></i> Información Básica</h5>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="plantel" class="form-label fw-bold">Plantel</label>
                             <input type="text" class="form-control" id="plantel" 
                                    value="Centro Universitario UAEM Temascaltepec" required>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label for="licenciatura" class="form-label fw-bold">Licenciatura</label>
                             <input type="text" class="form-control" id="licenciatura" 
-                                   value="Informática Administrativa" 
-                                   placeholder="Ej: Informática Administrativa" required>
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-4">
-                            <label for="programaEducativo" class="form-label fw-bold">Programa Educativo</label>
-                            <input type="text" class="form-control" id="programaEducativo" 
-                                   value="2015" placeholder="Ej: 2015">
+                                   value="Informática Administrativa" required>
                         </div>
                         <div class="col-md-4">
-                            <label for="areaCurricular" class="form-label fw-bold">Área de Curricular</label>
-                            <input type="text" class="form-control" id="areaCurricular" 
-                                   placeholder="Ej: Derecho Administrativo">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="clave" class="form-label fw-bold">Clave</label>
-                            <input type="text" class="form-control" id="clave" 
-                                   placeholder="Ej: LDE801">
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-3">
-                            <label for="horasTeoria" class="form-label fw-bold">Horas de Teoría</label>
-                            <input type="number" class="form-control" id="horasTeoria" 
-                                   value="3" min="0">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="horasPractica" class="form-label fw-bold">Horas de Práctica</label>
-                            <input type="number" class="form-control" id="horasPractica" 
-                                   value="1" min="0">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="totalHoras" class="form-label fw-bold">Total de Horas</label>
-                            <input type="number" class="form-control" id="totalHoras" 
-                                   value="4" min="0">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="creditos" class="form-label fw-bold">Créditos</label>
-                            <input type="number" class="form-control" id="creditos" 
-                                   value="7" min="0">
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-3">
-                            <label for="tipoUnidad" class="form-label fw-bold">Tipo de Unidad</label>
-                            <select class="form-select" id="tipoUnidad">
-                                <option value="CURSO" selected>CURSO</option>
-                                <option value="TALLER">TALLER</option>
-                                <option value="LABORATORIO">LABORATORIO</option>
-                                <option value="SEMINARIO">SEMINARIO</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="caracter" class="form-label fw-bold">Carácter</label>
-                            <select class="form-select" id="caracter">
-                                <option value="OBLIGATORIA" selected>OBLIGATORIA</option>
-                                <option value="OPTATIVA">OPTATIVA</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="nucleoFormacion" class="form-label fw-bold">Núcleo de Formación</label>
-                            <select class="form-select" id="nucleoFormacion">
-                                <option value="BÁSICO" selected>BÁSICO</option>
-                                <option value="SUSTANTIVO">SUSTANTIVO</option>
-                                <option value="INTEGRAL">INTEGRAL</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="modalidad" class="form-label fw-bold">Modalidad</label>
-                            <select class="form-select" id="modalidad">
-                                <option value="ESCOLARIZADA. SISTEMA FLEXIBLE" selected>ESCOLARIZADA. SISTEMA FLEXIBLE</option>
-                                <option value="NO ESCOLARIZADA">NO ESCOLARIZADA</option>
-                                <option value="MIXTA">MIXTA</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-4">
-                            <label for="prerrequisitos" class="form-label fw-bold">Prerrequisitos (Conocimientos Previos)</label>
-                            <input type="text" class="form-control" id="prerrequisitos" 
-                                   placeholder="Ej: Ninguno">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="unidadAntecedente" class="form-label fw-bold">Unidad de Aprendizaje Antecedente</label>
-                            <input type="text" class="form-control" id="unidadAntecedente" 
-                                   value="NINGUNO" placeholder="NINGUNO">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="unidadConsecuente" class="form-label fw-bold">Unidad de Aprendizaje Consecuente</label>
-                            <input type="text" class="form-control" id="unidadConsecuente" 
-                                   value="NINGUNO" placeholder="NINGUNO">
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-6">
-                            <label for="docente" class="form-label fw-bold">Planeación elaborada por</label>
+                            <label for="docente" class="form-label fw-bold">Nombre del Profesor</label>
                             <input type="text" class="form-control" id="docente" 
-                                   value="IDGS. Kenneth de Jesús Alcalá Beltrán" 
-                                   placeholder="Nombre del docente" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="fechaElaboracion" class="form-label fw-bold">Fecha de Elaboración</label>
-                            <input type="date" class="form-control" id="fechaElaboracion" 
-                                   value="2026-01-24" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="fechaAprobacion" class="form-label fw-bold">Fecha de Aprobación</label>
-                            <input type="date" class="form-control" id="fechaAprobacion" 
-                                   value="2026-01-24" required>
-                        </div>
-                    </div>
-                    <div class="row g-3 mt-2">
-                        <div class="col-md-6">
-                            <label for="elaboro" class="form-label fw-bold">Elaboró</label>
-                            <input type="text" class="form-control" id="elaboro" 
-                                   value="IDGS. Kenneth de Jesús Alcalá Beltrán" 
-                                   placeholder="Mismo que docente" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="aprobo" class="form-label fw-bold">Aprobó</label>
-                            <input type="text" class="form-control" id="aprobo" 
-                                   value="Coordinación de Informática Administrativa" required>
+                                   value="IDGS. Kenneth de Jesús Alcalá Beltrán" required>
                         </div>
                     </div>
                 </div>
@@ -514,28 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const datos = {
-            // Información institucional completa
             plantel: document.getElementById('plantel').value,
             licenciatura: document.getElementById('licenciatura').value,
-            programaEducativo: document.getElementById('programaEducativo').value,
-            areaCurricular: document.getElementById('areaCurricular').value,
-            clave: document.getElementById('clave').value,
-            horasTeoria: parseInt(document.getElementById('horasTeoria').value) || 0,
-            horasPractica: parseInt(document.getElementById('horasPractica').value) || 0,
-            totalHoras: parseInt(document.getElementById('totalHoras').value) || 0,
-            creditos: parseInt(document.getElementById('creditos').value) || 0,
-            tipoUnidad: document.getElementById('tipoUnidad').value,
-            caracter: document.getElementById('caracter').value,
-            nucleoFormacion: document.getElementById('nucleoFormacion').value,
-            modalidad: document.getElementById('modalidad').value,
-            prerrequisitos: document.getElementById('prerrequisitos').value,
-            unidadAntecedente: document.getElementById('unidadAntecedente').value,
-            unidadConsecuente: document.getElementById('unidadConsecuente').value,
             docente: document.getElementById('docente').value,
-            elaboro: document.getElementById('elaboro').value,
-            aprobo: document.getElementById('aprobo').value,
-            fechaElaboracion: new Date(document.getElementById('fechaElaboracion').value),
-            fechaAprobacion: new Date(document.getElementById('fechaAprobacion').value),
             semestre: document.getElementById('semestre').value,
             inicioClases: new Date(document.getElementById('inicioClases').value),
             finClases: new Date(document.getElementById('finClases').value),
