@@ -685,23 +685,35 @@
         }
 
         function genBasico(datos) {
+            console.log('Generando plan básico con datos:', datos);
             const plan = { materias: [] };
 
             datos.materias.forEach(m => {
                 const sesi = [];
                 const dias = m.horarios.map(h => h.dia);
-                const sem = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+                console.log('Días de clase:', dias);
+                
+                // Mapeo correcto de días
+                const diasSemana = {
+                    0: 'Domingo',
+                    1: 'Lunes',
+                    2: 'Martes',
+                    3: 'Miércoles',
+                    4: 'Jueves',
+                    5: 'Viernes',
+                    6: 'Sábado'
+                };
 
                 let f = new Date(datos.inicio);
                 let n = 1;
 
                 while (f <= datos.fin) {
-                    const d = sem[f.getDay() - 1];
-                    if (dias.includes(d)) {
+                    const nombreDia = diasSemana[f.getDay()];
+                    if (dias.includes(nombreDia)) {
                         sesi.push({
-                            numero: n++,
+                            numero: n,
                             fecha: f.toISOString().split('T')[0],
-                            unidadTema: `Sesión ${n - 1}`,
+                            unidadTema: `Sesión ${n}`,
                             conocimientos: 'Por definir',
                             estrategiasEnsenanza: 'Por definir',
                             estrategiasAprendizaje: 'Por definir',
@@ -709,10 +721,12 @@
                             recursos: 'Por definir',
                             evidencias: 'Por definir'
                         });
+                        n++;
                     }
                     f.setDate(f.getDate() + 1);
                 }
 
+                console.log(`Generadas ${sesi.length} sesiones`);
                 plan.materias.push({ nombre: m.nombre, sesiones: sesi });
             });
 
@@ -760,7 +774,17 @@
 
             // PÁGINAS DE CONTENIDO
             const mat = datos.materias[0];
-            const matPlan = plan.materias[0];
+            const matPlan = plan.materias?.[0];
+            
+            console.log('Datos materia:', mat);
+            console.log('Plan materia:', matPlan);
+            console.log('Plan completo:', plan);
+
+            if (!matPlan || !matPlan.sesiones || matPlan.sesiones.length === 0) {
+                console.error('No hay sesiones en el plan');
+                alert('Error: No se generaron sesiones. Verifica que hayas agregado horarios y que las fechas sean correctas.');
+                return;
+            }
 
             if (mat.unidades?.length > 0 && matPlan?.sesiones) {
                 const totSes = matPlan.sesiones.length;
