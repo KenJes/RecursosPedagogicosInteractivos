@@ -222,29 +222,124 @@
                         </div>
                     </div>
                     <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <label for="programaEducativo" class="form-label fw-bold">Programa Educativo</label>
+                            <input type="text" class="form-control" id="programaEducativo" 
+                                   value="2015" placeholder="Ej: 2015">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="areaCurricular" class="form-label fw-bold">Área de Curricular</label>
+                            <input type="text" class="form-control" id="areaCurricular" 
+                                   placeholder="Ej: Derecho Administrativo">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="clave" class="form-label fw-bold">Clave</label>
+                            <input type="text" class="form-control" id="clave" 
+                                   placeholder="Ej: LDE801">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <label for="horasTeoria" class="form-label fw-bold">Horas de Teoría</label>
+                            <input type="number" class="form-control" id="horasTeoria" 
+                                   value="3" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="horasPractica" class="form-label fw-bold">Horas de Práctica</label>
+                            <input type="number" class="form-control" id="horasPractica" 
+                                   value="1" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="totalHoras" class="form-label fw-bold">Total de Horas</label>
+                            <input type="number" class="form-control" id="totalHoras" 
+                                   value="4" min="0">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="creditos" class="form-label fw-bold">Créditos</label>
+                            <input type="number" class="form-control" id="creditos" 
+                                   value="7" min="0">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-3">
+                            <label for="tipoUnidad" class="form-label fw-bold">Tipo de Unidad</label>
+                            <select class="form-select" id="tipoUnidad">
+                                <option value="CURSO" selected>CURSO</option>
+                                <option value="TALLER">TALLER</option>
+                                <option value="LABORATORIO">LABORATORIO</option>
+                                <option value="SEMINARIO">SEMINARIO</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="caracter" class="form-label fw-bold">Carácter</label>
+                            <select class="form-select" id="caracter">
+                                <option value="OBLIGATORIA" selected>OBLIGATORIA</option>
+                                <option value="OPTATIVA">OPTATIVA</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="nucleoFormacion" class="form-label fw-bold">Núcleo de Formación</label>
+                            <select class="form-select" id="nucleoFormacion">
+                                <option value="BÁSICO" selected>BÁSICO</option>
+                                <option value="SUSTANTIVO">SUSTANTIVO</option>
+                                <option value="INTEGRAL">INTEGRAL</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="modalidad" class="form-label fw-bold">Modalidad</label>
+                            <select class="form-select" id="modalidad">
+                                <option value="ESCOLARIZADA. SISTEMA FLEXIBLE" selected>ESCOLARIZADA. SISTEMA FLEXIBLE</option>
+                                <option value="NO ESCOLARIZADA">NO ESCOLARIZADA</option>
+                                <option value="MIXTA">MIXTA</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <label for="prerrequisitos" class="form-label fw-bold">Prerrequisitos (Conocimientos Previos)</label>
+                            <input type="text" class="form-control" id="prerrequisitos" 
+                                   placeholder="Ej: Ninguno">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unidadAntecedente" class="form-label fw-bold">Unidad de Aprendizaje Antecedente</label>
+                            <input type="text" class="form-control" id="unidadAntecedente" 
+                                   value="NINGUNO" placeholder="NINGUNO">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="unidadConsecuente" class="form-label fw-bold">Unidad de Aprendizaje Consecuente</label>
+                            <input type="text" class="form-control" id="unidadConsecuente" 
+                                   value="NINGUNO" placeholder="NINGUNO">
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
                         <div class="col-md-6">
-                            <label for="docente" class="form-label fw-bold">Docente</label>
+                            <label for="docente" class="form-label fw-bold">Planeación elaborada por</label>
                             <input type="text" class="form-control" id="docente" 
                                    value="IDGS. Kenneth de Jesús Alcalá Beltrán" 
-                                   placeholder="Ej: IDGS. Kenneth de Jesús Alcalá Beltrán" required>
+                                   placeholder="Nombre del docente" required>
                         </div>
+                        <div class="col-md-3">
+                            <label for="fechaElaboracion" class="form-label fw-bold">Fecha de Elaboración</label>
+                            <input type="date" class="form-control" id="fechaElaboracion" 
+                                   value="2026-01-24" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="fechaAprobacion" class="form-label fw-bold">Fecha de Aprobación</label>
+                            <input type="date" class="form-control" id="fechaAprobacion" 
+                                   value="2026-01-24" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
                         <div class="col-md-6">
                             <label for="elaboro" class="form-label fw-bold">Elaboró</label>
                             <input type="text" class="form-control" id="elaboro" 
                                    value="IDGS. Kenneth de Jesús Alcalá Beltrán" 
                                    placeholder="Mismo que docente" required>
                         </div>
-                    </div>
-                    <div class="row g-3 mt-2">
                         <div class="col-md-6">
                             <label for="aprobo" class="form-label fw-bold">Aprobó</label>
                             <input type="text" class="form-control" id="aprobo" 
                                    value="Coordinación de Informática Administrativa" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="semestre" class="form-label fw-bold">Semestre</label>
-                            <input type="text" class="form-control" id="semestre" 
-                                   value="2026A" required>
                         </div>
                     </div>
                 </div>
@@ -257,6 +352,13 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="semestre" class="form-label fw-bold">Semestre</label>
+                            <input type="text" class="form-control" id="semestre" 
+                                   value="2026A" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
                         <div class="col-md-6">
                             <label for="inicioClases" class="form-label fw-bold">
                                 <i class="bi bi-calendar-check"></i> Fecha de inicio de clases
@@ -272,22 +374,45 @@
                                    value="2026-06-09" required>
                         </div>
                     </div>
-                    <div class="row g-3 mt-2">
+                    
+                    <div class="alert alert-info mt-3 mb-3">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Periodos de Exámenes:</strong> Indica los rangos de fechas estimados
+                    </div>
+                    
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="primerParcial" class="form-label fw-bold">
-                                <i class="bi bi-clipboard-check"></i> Fecha de primer parcial (inicio)
+                            <label for="inicioPrimerParcial" class="form-label fw-bold">
+                                <i class="bi bi-clipboard-check"></i> Inicio primer parcial
                             </label>
-                            <input type="date" class="form-control" id="primerParcial" 
-                                   value="2026-03-25" required>
+                            <input type="date" class="form-control" id="inicioPrimerParcial" 
+                                   value="2026-03-23">
                         </div>
                         <div class="col-md-6">
-                            <label for="segundoParcial" class="form-label fw-bold">
-                                <i class="bi bi-clipboard-check"></i> Fecha de segundo parcial (inicio)
+                            <label for="finPrimerParcial" class="form-label fw-bold">
+                                <i class="bi bi-clipboard-check"></i> Fin primer parcial
                             </label>
-                            <input type="date" class="form-control" id="segundoParcial" 
-                                   value="2026-05-25" required>
+                            <input type="date" class="form-control" id="finPrimerParcial" 
+                                   value="2026-03-27">
                         </div>
                     </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <label for="inicioSegundoParcial" class="form-label fw-bold">
+                                <i class="bi bi-clipboard-check"></i> Inicio segundo parcial
+                            </label>
+                            <input type="date" class="form-control" id="inicioSegundoParcial" 
+                                   value="2026-05-25">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="finSegundoParcial" class="form-label fw-bold">
+                                <i class="bi bi-clipboard-check"></i> Fin segundo parcial
+                            </label>
+                            <input type="date" class="form-control" id="finSegundoParcial" 
+                                   value="2026-05-29">
+                        </div>
+                    </div>
+                    
                     <div class="alert alert-warning mt-3 mb-0">
                         <i class="bi bi-calendar-range"></i> 
                         Las fechas se ajustarán considerando días festivos y periodos vacacionales UAEMéx.
@@ -305,6 +430,31 @@
                     <button type="button" class="btn btn-success btn-lg w-100" onclick="agregarMateria()">
                         <i class="bi bi-plus-circle"></i> Agregar Materia
                     </button>
+                </div>
+            </div>
+
+            <!-- Viajes de Práctica -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-gradient text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Viajes de Práctica (Opcional)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="tieneViajes">
+                        <label class="form-check-label fw-bold" for="tieneViajes">
+                            ¿Se realizarán viajes de práctica durante el semestre?
+                        </label>
+                    </div>
+                    
+                    <div id="viajesContainer" style="display: none;">
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-info-circle"></i> Agrega los detalles de cada viaje de práctica programado
+                        </div>
+                        <div id="viajes-list" class="mb-3"></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarViaje()">
+                            <i class="bi bi-plus-circle"></i> Agregar Viaje
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -374,6 +524,7 @@ const VACACIONES = [
 ];
 
 let materiaCount = 0;
+let viajeCount = 0;
 let filesContent = [];
 let AI_ENABLED = true;
 
@@ -385,6 +536,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (GITHUB_API_KEY) {
         tokenInput.value = GITHUB_API_KEY;
     }
+    
+    // Toggle para viajes de práctica
+    document.getElementById('tieneViajes').addEventListener('change', (e) => {
+        document.getElementById('viajesContainer').style.display = e.target.checked ? 'block' : 'none';
+    });
     
     // Guardar token cuando el usuario termine de escribir (blur) o presione Enter
     tokenInput.addEventListener('blur', (e) => {
@@ -466,18 +622,59 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const datos = {
+            // Información institucional completa
             plantel: document.getElementById('plantel').value,
             licenciatura: document.getElementById('licenciatura').value,
+            programaEducativo: document.getElementById('programaEducativo').value,
+            areaCurricular: document.getElementById('areaCurricular').value,
+            clave: document.getElementById('clave').value,
+            horasTeoria: parseInt(document.getElementById('horasTeoria').value) || 0,
+            horasPractica: parseInt(document.getElementById('horasPractica').value) || 0,
+            totalHoras: parseInt(document.getElementById('totalHoras').value) || 0,
+            creditos: parseInt(document.getElementById('creditos').value) || 0,
+            tipoUnidad: document.getElementById('tipoUnidad').value,
+            caracter: document.getElementById('caracter').value,
+            nucleoFormacion: document.getElementById('nucleoFormacion').value,
+            modalidad: document.getElementById('modalidad').value,
+            prerrequisitos: document.getElementById('prerrequisitos').value,
+            unidadAntecedente: document.getElementById('unidadAntecedente').value,
+            unidadConsecuente: document.getElementById('unidadConsecuente').value,
             docente: document.getElementById('docente').value,
             elaboro: document.getElementById('elaboro').value,
             aprobo: document.getElementById('aprobo').value,
+            fechaElaboracion: new Date(document.getElementById('fechaElaboracion').value),
+            fechaAprobacion: new Date(document.getElementById('fechaAprobacion').value),
             semestre: document.getElementById('semestre').value,
             inicioClases: new Date(document.getElementById('inicioClases').value),
             finClases: new Date(document.getElementById('finClases').value),
-            primerParcial: new Date(document.getElementById('primerParcial').value),
-            segundoParcial: new Date(document.getElementById('segundoParcial').value),
-            materias: []
+            inicioPrimerParcial: new Date(document.getElementById('inicioPrimerParcial').value),
+            finPrimerParcial: new Date(document.getElementById('finPrimerParcial').value),
+            inicioSegundoParcial: new Date(document.getElementById('inicioSegundoParcial').value),
+            finSegundoParcial: new Date(document.getElementById('finSegundoParcial').value),
+            materias: [],
+            viajes: []
         };
+        
+        // Recolectar viajes de práctica
+        if (document.getElementById('tieneViajes').checked) {
+            document.querySelectorAll('#viajes-list > .card').forEach(viajeCard => {
+                const destino = viajeCard.querySelector('.viaje-destino')?.value;
+                const fechaSalida = viajeCard.querySelector('.viaje-fecha-salida')?.value;
+                const fechaRegreso = viajeCard.querySelector('.viaje-fecha-regreso')?.value;
+                const objetivo = viajeCard.querySelector('.viaje-objetivo')?.value;
+                const actividades = viajeCard.querySelector('.viaje-actividades')?.value;
+                
+                if (destino || fechaSalida) {
+                    datos.viajes.push({
+                        destino,
+                        fechaSalida: fechaSalida ? new Date(fechaSalida) : null,
+                        fechaRegreso: fechaRegreso ? new Date(fechaRegreso) : null,
+                        objetivo,
+                        actividades
+                    });
+                }
+            });
+        }
         
         document.querySelectorAll('#materias-container > .card').forEach(item => {
             const horarios = [];
@@ -757,6 +954,52 @@ function renumerarUnidades(materiaId) {
     Array.from(contenedor.children).forEach((unidad, index) => {
         unidad.querySelector('h6').innerHTML = `<i class="bi bi-bookmark-fill"></i> Unidad ${index + 1}`;
     });
+}
+
+function agregarViaje() {
+    viajeCount++;
+    const div = document.createElement('div');
+    div.className = 'card mb-2';
+    div.innerHTML = `
+        <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="mb-0"><i class="bi bi-bus-front"></i> Viaje ${viajeCount}</h6>
+                <button type="button" class="btn btn-danger btn-sm" 
+                        onclick="this.closest('.card').remove()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+            
+            <div class="row g-2">
+                <div class="col-md-6 mb-2">
+                    <label class="form-label small mb-1">Destino</label>
+                    <input type="text" class="form-control form-control-sm viaje-destino" 
+                           placeholder="Ej: Zona arqueológica de Teotihuacán">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label class="form-label small mb-1">Fecha de salida</label>
+                    <input type="date" class="form-control form-control-sm viaje-fecha-salida">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <label class="form-label small mb-1">Fecha de regreso</label>
+                    <input type="date" class="form-control form-control-sm viaje-fecha-regreso">
+                </div>
+            </div>
+            
+            <div class="mb-2">
+                <label class="form-label small mb-1">Objetivo del viaje</label>
+                <textarea class="form-control form-control-sm viaje-objetivo" rows="2" 
+                          placeholder="Ej: Observar y analizar..."></textarea>
+            </div>
+            
+            <div class="mb-0">
+                <label class="form-label small mb-1">Actividades a realizar</label>
+                <textarea class="form-control form-control-sm viaje-actividades" rows="2" 
+                          placeholder="Ej: Recorrido guiado, toma de muestras..."></textarea>
+            </div>
+        </div>
+    `;
+    document.getElementById('viajes-list').appendChild(div);
 }
 
 async function generarConIA(datos) {
