@@ -1066,7 +1066,24 @@ async function generarConIA(datos) {
     }
     
     const data = await response.json();
-    return JSON.parse(data.choices[0].message.content);
+    
+    // Validar que la respuesta tenga el formato esperado
+    if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+        console.error('Respuesta inesperada de la API:', data);
+        throw new Error('La IA no devolvió una respuesta válida. Intenta de nuevo o usa el modo sin IA.');
+    }
+    
+    const content = data.choices[0].message.content.trim();
+    if (!content) {
+        throw new Error('La IA devolvió una respuesta vacía.');
+    }
+    
+    try {
+        return JSON.parse(content);
+    } catch (parseError) {
+        console.error('Error al parsear JSON:', content);
+        throw new Error('La respuesta de la IA no es un JSON válido. Intenta de nuevo o usa el modo sin IA.');
+    }
 }
 
 function generarTradicional(datos) {
