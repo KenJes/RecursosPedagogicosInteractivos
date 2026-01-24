@@ -118,19 +118,19 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label for="ini1" class="form-label">Inicio 1er parcial</label>
-                            <input type="date" class="form-control" id="ini1" value="2026-03-23" required>
+                            <input type="date" class="form-control" id="ini1" value="2026-03-25" required>
                         </div>
                         <div class="col-md-3">
                             <label for="fin1" class="form-label">Fin 1er parcial</label>
-                            <input type="date" class="form-control" id="fin1" value="2026-03-27" required>
+                            <input type="date" class="form-control" id="fin1" value="2026-04-09" required>
                         </div>
                         <div class="col-md-3">
                             <label for="ini2" class="form-label">Inicio 2do parcial</label>
-                            <input type="date" class="form-control" id="ini2" value="2026-05-25" required>
+                            <input type="date" class="form-control" id="ini2" value="2026-05-29" required>
                         </div>
                         <div class="col-md-3">
                             <label for="fin2" class="form-label">Fin 2do parcial</label>
-                            <input type="date" class="form-control" id="fin2" value="2026-05-29" required>
+                            <input type="date" class="form-control" id="fin2" value="2026-06-08" required>
                         </div>
                     </div>
                 </div>
@@ -595,17 +595,17 @@
         });
 
         async function genIA(datos) {
-            let p = `Genera planeación detallada SESIÓN POR SESIÓN.\n\nPeriodo: ${datos.inicio.toLocaleDateString('es-MX')} - ${datos.fin.toLocaleDateString('es-MX')}\n\n`;
+            let p = `Genera planeación pedagógica MUY DETALLADA SESIÓN POR SESIÓN para una clase universitaria.\n\nPeriodo: ${datos.inicio.toLocaleDateString('es-MX')} - ${datos.fin.toLocaleDateString('es-MX')}\n\n`;
 
             if (FILES.length > 0) {
-                p += "TEMARIOS:\n";
+                p += "TEMARIOS Y CONTENIDOS:\n";
                 FILES.forEach(f => p += `\n--- ${f.nombre} ---\n${f.contenido}\n`);
             }
 
             datos.materias.forEach((m, i) => {
-                p += `\nMATERIA ${i + 1}: ${m.nombre}\n`;
-                if (m.competencias) p += `Competencias: ${m.competencias}\n`;
-                if (m.objetivo) p += `Objetivo: ${m.objetivo}\n`;
+                p += `\nMATERIA: ${m.nombre}\n`;
+                if (m.competencias) p += `Objetivos del área: ${m.competencias}\n`;
+                if (m.objetivo) p += `Objetivos de la UA: ${m.objetivo}\n`;
                 if (m.horarios.length > 0) {
                     p += 'Horarios: ' + m.horarios.map(h => `${h.dia} ${h.inicio}-${h.fin}`).join(', ') + '\n';
                 }
@@ -619,7 +619,7 @@
                 }
             });
 
-            p += `\n\nDevuelve ÚNICAMENTE un objeto JSON válido (sin markdown, sin explicaciones, sin código adicional).\nFormato exacto:\n{\n  "materias": [\n    {\n      "nombre": "Nombre de la materia",\n      "sesiones": [\n        {\n          "numero": 1,\n          "fecha": "YYYY-MM-DD",\n          "unidadTema": "Texto corto",\n          "conocimientos": "Texto corto",\n          "estrategiasEnsenanza": "Texto corto",\n          "estrategiasAprendizaje": "Texto corto",\n          "tecnicas": "Texto corto",\n          "recursos": "Texto corto",\n          "evidencias": "Texto corto"\n        }\n      ]\n    }\n  ]\n}\n\nREGLAS CRÍTICAS:\n1. SOLO devuelve el JSON, nada más\n2. NO uses saltos de línea dentro de los valores de texto\n3. Escapa correctamente comillas dobles con \\\"\n4. Genera TODAS las sesiones según horarios\n5. Mantén los textos breves (máximo 150 caracteres por campo)`;
+            p += `\n\nDevuelve ÚNICAMENTE un objeto JSON válido.\nFormato:\n{\n  "materias": [\n    {\n      "nombre": "Nombre de la materia",\n      "sesiones": [\n        {\n          "numero": 1,\n          "fecha": "YYYY-MM-DD",\n          "unidadTema": "Unidad y tema específico",\n          "conocimientos": "Conceptos y conocimientos que se abordarán (detallado)",\n          "estrategiasEnsenanza": "Actividades del docente: exposición, demostración, uso de recursos, etc. (muy específico)",\n          "estrategiasAprendizaje": "Actividades de los estudiantes: ejercicios, trabajos, investigación, discusión, etc. (muy específico)",\n          "tecnicas": "Técnicas pedagógicas: aprendizaje colaborativo, estudio de casos, mapas conceptuales, etc.",\n          "recursos": "Materiales y recursos didácticos: presentaciones, lecturas, videos, software, artículos, etc.",\n          "evidencias": "Productos evaluables: tareas, reportes, ejercicios, participaciones, ensayos, etc."\n        }\n      ]\n    }\n  ]\n}\n\nINSTRUCCIONES CRÍTICAS:\n1. SOLO devuelve el JSON puro, sin markdown ni texto adicional\n2. SÉ MUY DETALLADO Y ESPECÍFICO en cada campo (120-180 caracteres por campo)\n3. Describe ACCIONES CONCRETAS que el profesor y estudiantes realizarán\n4. En estrategiasEnsenanza especifica: \"Exposición magistral sobre X tema, demostración de Y procedimiento, organización de Z actividad\"\n5. En estrategiasAprendizaje especifica: \"Resolución de ejercicios prácticos, elaboración de mapas mentales, análisis de casos, trabajo en equipo\"\n6. NO uses saltos de línea dentro de strings\n7. Escapa comillas con \\\"\n8. Genera TODAS las sesiones según horarios`;
 
             const r = await fetch('https://models.inference.ai.azure.com/chat/completions', {
                 method: 'POST',
@@ -706,12 +706,12 @@
                             numero: n,
                             fecha: f.toISOString().split('T')[0],
                             unidadTema: `Sesión ${n}`,
-                            conocimientos: 'Por definir',
-                            estrategiasEnsenanza: 'Por definir',
-                            estrategiasAprendizaje: 'Por definir',
-                            tecnicas: 'Por definir',
-                            recursos: 'Por definir',
-                            evidencias: 'Por definir'
+                            conocimientos: 'Conceptos y temas a abordar durante la sesión',
+                            estrategiasEnsenanza: 'Exposición del tema, demostraciones prácticas, uso de recursos multimedia',
+                            estrategiasAprendizaje: 'Participación activa, toma de apuntes, resolución de ejercicios, trabajo individual y colaborativo',
+                            tecnicas: 'Aprendizaje activo, aprendizaje colaborativo, resolución de problemas',
+                            recursos: 'Presentaciones, material de apoyo, lecturas complementarias, herramientas tecnológicas',
+                            evidencias: 'Participación en clase, ejercicios resueltos, tareas individuales'
                         });
                         n++;
                     }
