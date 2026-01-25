@@ -762,18 +762,7 @@ FORMATO EXACTO DEL JSON:
                 while (f <= datos.fin) {
                     const nombreDia = diasSemana[f.getDay()];
                     
-                    // SALTAR días de exámenes
-                    const esExamen = (f >= datos.ini1 && f <= datos.fin1) || (f >= datos.ini2 && f <= datos.fin2);
-                    
-                    // SALTAR días de viajes
-                    const esViaje = datos.viajes.some(v => {
-                        if (!v.salida || !v.regreso) return false;
-                        const fSalida = new Date(v.salida);
-                        const fRegreso = new Date(v.regreso);
-                        return f >= fSalida && f <= fRegreso;
-                    });
-                    
-                    if (dias.includes(nombreDia) && !esExamen && !esViaje) {
+                    if (dias.includes(nombreDia)) {
                         sesi.push({
                             numero: n,
                             fecha: f.toISOString().split('T')[0],
@@ -893,15 +882,22 @@ FORMATO EXACTO DEL JSON:
             sesiones.forEach((s, idx) => {
                 const fechaSesion = new Date(s.fecha);
                 
-                // Verificar si debemos insertar examen 1 ANTES de esta sesión
-                if (!examen1Insertado && fechaSesion > datos.ini1) {
+                // Si esta sesión cae en periodo de examen 1, REEMPLAZARLA con info de examen
+                if (!examen1Insertado && fechaSesion >= datos.ini1 && fechaSesion <= datos.fin1) {
                     examen1Insertado = true;
+                    
+                    // Contar cuántas sesiones caen en el periodo
+                    const sesionesExamen = sesiones.filter(ses => {
+                        const f = new Date(ses.fecha);
+                        return f >= datos.ini1 && f <= datos.fin1;
+                    }).length;
+                    
                     tData.push([{
                         content: `Preparación para primer parcial`,
                         colSpan: 2,
                         styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 200] }
                     }, {
-                        content: '1',
+                        content: sesionesExamen.toString(),
                         styles: { halign: 'center', fillColor: [255, 255, 200] }
                     }, {
                         content: `${datos.ini1.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}`,
@@ -913,21 +909,29 @@ FORMATO EXACTO DEL JSON:
                     }]);
                     
                     tData.push([{
-                        content: 'Examen y revisión Primer parcial',
+                        content: `Examen y revisión Primer parcial (${datos.ini1.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})} al ${datos.fin1.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})})`,
                         colSpan: 7,
-                        styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 200] }
+                        styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 200] }
                     }]);
+                    return; // No agregar la sesión normal
                 }
                 
-                // Verificar si debemos insertar examen 2 ANTES de esta sesión
-                if (!examen2Insertado && fechaSesion > datos.ini2) {
+                // Si esta sesión cae en periodo de examen 2, REEMPLAZARLA con info de examen
+                if (!examen2Insertado && fechaSesion >= datos.ini2 && fechaSesion <= datos.fin2) {
                     examen2Insertado = true;
+                    
+                    // Contar cuántas sesiones caen en el periodo
+                    const sesionesExamen = sesiones.filter(ses => {
+                        const f = new Date(ses.fecha);
+                        return f >= datos.ini2 && f <= datos.fin2;
+                    }).length;
+                    
                     tData.push([{
                         content: `Preparación para segundo parcial`,
                         colSpan: 2,
                         styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 200] }
                     }, {
-                        content: '1',
+                        content: sesionesExamen.toString(),
                         styles: { halign: 'center', fillColor: [255, 255, 200] }
                     }, {
                         content: `${datos.ini2.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}`,
@@ -939,39 +943,83 @@ FORMATO EXACTO DEL JSON:
                     }]);
                     
                     tData.push([{
-                        content: 'Examen y revisión Segundo parcial',
+                        content: `Examen y revisión Segundo parcial (${datos.ini2.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})} al ${datos.fin2.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})})`,
                         colSpan: 7,
-                        styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 200] }
+                        styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 200] }
                     }]);
+                    return; // No agregar la sesión normal
                 }
                 
-                // Verificar si debemos insertar algún viaje ANTES de esta sesión
+                // Verificar si esta sesión cae en algún viaje
+                let viajeActual = null;
+                let viajeIdx = -1;
                 datos.viajes.forEach((viaje, vIdx) => {
-                    if (!viajesInsertados.has(vIdx) && viaje.salida && viaje.regreso) {
+                    if (viaje.salida && viaje.regreso && !viajesInsertados.has(vIdx)) {
                         const fSalida = new Date(viaje.salida);
                         const fRegreso = new Date(viaje.regreso);
                         
-                        if (fechaSesion > fSalida && !viajesInsertados.has(vIdx)) {
-                            viajesInsertados.add(vIdx);
-                            
-                            tData.push([{
-                                content: `VIAJE DE PRÁCTICA: ${viaje.destino}`,
-                                colSpan: 2,
-                                styles: { halign: 'left', fontStyle: 'bold', fillColor: [200, 255, 200] }
-                            }, {
-                                content: '1',
-                                styles: { halign: 'center', fillColor: [200, 255, 200] }
-                            }, {
-                                content: `${fSalida.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})} - ${fRegreso.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}`,
-                                styles: { halign: 'center', fillColor: [200, 255, 200] }
-                            }, {
-                                content: viaje.objetivo || 'Viaje de práctica',
-                                colSpan: 3,
-                                styles: { halign: 'left', fillColor: [200, 255, 200] }
-                            }]);
+                        if (fechaSesion >= fSalida && fechaSesion <= fRegreso) {
+                            viajeActual = viaje;
+                            viajeIdx = vIdx;
                         }
                     }
                 });
+                
+                if (viajeActual && !viajesInsertados.has(viajeIdx)) {
+                    viajesInsertados.add(viajeIdx);
+                    
+                    const fSalida = new Date(viajeActual.salida);
+                    const fRegreso = new Date(viajeActual.regreso);
+                    
+                    // Contar sesiones durante el viaje
+                    const sesionesViaje = sesiones.filter(ses => {
+                        const f = new Date(ses.fecha);
+                        return f >= fSalida && f <= fRegreso;
+                    }).length;
+                    
+                    tData.push([{
+                        content: `VIAJE DE PRÁCTICA: ${viajeActual.destino}`,
+                        colSpan: 7,
+                        styles: { halign: 'center', fontStyle: 'bold', fillColor: [200, 255, 200], fontSize: 9 }
+                    }]);
+                    
+                    tData.push([{
+                        content: `Periodo: ${fSalida.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})} al ${fRegreso.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})}`,
+                        colSpan: 2,
+                        styles: { halign: 'left', fillColor: [200, 255, 200] }
+                    }, {
+                        content: sesionesViaje.toString(),
+                        styles: { halign: 'center', fillColor: [200, 255, 200] }
+                    }, {
+                        content: viajeActual.objetivo || 'Viaje de práctica',
+                        colSpan: 4,
+                        styles: { halign: 'left', fillColor: [200, 255, 200] }
+                    }]);
+                    
+                    if (viajeActual.actividades) {
+                        tData.push([{
+                            content: `Actividades: ${viajeActual.actividades}`,
+                            colSpan: 7,
+                            styles: { halign: 'left', fillColor: [200, 255, 200] }
+                        }]);
+                    }
+                    
+                    return; // No agregar la sesión normal
+                }
+                
+                // Verificar si ya pasamos este periodo (para sesiones posteriores en el mismo periodo)
+                const enExamen1 = fechaSesion >= datos.ini1 && fechaSesion <= datos.fin1 && examen1Insertado;
+                const enExamen2 = fechaSesion >= datos.ini2 && fechaSesion <= datos.fin2 && examen2Insertado;
+                const enViaje = datos.viajes.some((v, vIdx) => {
+                    if (!v.salida || !v.regreso || !viajesInsertados.has(vIdx)) return false;
+                    const fSalida = new Date(v.salida);
+                    const fRegreso = new Date(v.regreso);
+                    return fechaSesion >= fSalida && fechaSesion <= fRegreso;
+                });
+                
+                if (enExamen1 || enExamen2 || enViaje) {
+                    return; // Saltar esta sesión, ya insertamos el bloque
+                }
                 
                 // Agregar la sesión normal
                 tData.push([
