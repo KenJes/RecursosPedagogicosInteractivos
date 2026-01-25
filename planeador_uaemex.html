@@ -809,30 +809,128 @@
                     const sesUni = matPlan.sesiones.slice(uIdx * sesXUni, (uIdx + 1) * sesXUni);
 
                     const tData = [];
-                    sesUni.forEach(s => {
-                        if (esExamen(s.fecha, datos)) {
+                    let i = 0;
+                    let enExamen1 = false, enExamen2 = false;
+                    
+                    while (i < sesUni.length) {
+                        const s = sesUni[i];
+                        const fechaSesion = new Date(s.fecha);
+                        
+                        // Verificar si estamos entrando al periodo de examen 1
+                        if (!enExamen1 && fechaSesion >= datos.ini1 && fechaSesion <= datos.fin1) {
+                            enExamen1 = true;
+                            const sesionesEnExamen = sesUni.filter(ses => {
+                                const f = new Date(ses.fecha);
+                                return f >= datos.ini1 && f <= datos.fin1;
+                            }).length;
+                            
                             tData.push([{
-                                content: tipoExamen(s.fecha, datos),
-                                colSpan: 7,
-                                styles: { halign: 'center', fontStyle: 'bold', fillColor: [255, 255, 200] }
+                                content: `Preparación para primer parcial`,
+                                colSpan: 2,
+                                styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 255] }
+                            }, {
+                                content: sesionesEnExamen.toString(),
+                                styles: { halign: 'center', fillColor: [255, 255, 255] }
+                            }, {
+                                content: `${datos.ini1.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}`,
+                                styles: { halign: 'center', fillColor: [255, 255, 255] }
+                            }, {
+                                content: 'Revisarán conceptos clave y resolverán dudas para el examen.',
+                                colSpan: 3,
+                                styles: { halign: 'left', fillColor: [255, 255, 255] }
                             }]);
+                            
+                            tData.push([{
+                                content: 'Examen y revisión Primer parcial',
+                                colSpan: 7,
+                                styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 255] }
+                            }]);
+                            
+                            // Saltar todas las sesiones del examen
+                            while (i < sesUni.length && new Date(sesUni[i].fecha) <= datos.fin1) {
+                                i++;
+                            }
+                            continue;
                         }
-
+                        
+                        // Verificar si estamos entrando al periodo de examen 2
+                        if (!enExamen2 && fechaSesion >= datos.ini2 && fechaSesion <= datos.fin2) {
+                            enExamen2 = true;
+                            const sesionesEnExamen = sesUni.filter(ses => {
+                                const f = new Date(ses.fecha);
+                                return f >= datos.ini2 && f <= datos.fin2;
+                            }).length;
+                            
+                            tData.push([{
+                                content: `Preparación para segundo parcial`,
+                                colSpan: 2,
+                                styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 255] }
+                            }, {
+                                content: sesionesEnExamen.toString(),
+                                styles: { halign: 'center', fillColor: [255, 255, 255] }
+                            }, {
+                                content: `${datos.ini2.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}`,
+                                styles: { halign: 'center', fillColor: [255, 255, 255] }
+                            }, {
+                                content: 'Revisarán conceptos clave y resolverán dudas para el examen.',
+                                colSpan: 3,
+                                styles: { halign: 'left', fillColor: [255, 255, 255] }
+                            }]);
+                            
+                            tData.push([{
+                                content: 'Examen y revisión Segundo parcial',
+                                colSpan: 7,
+                                styles: { halign: 'left', fontStyle: 'normal', fillColor: [255, 255, 255] }
+                            }]);
+                            
+                            // Saltar todas las sesiones del examen
+                            while (i < sesUni.length && new Date(sesUni[i].fecha) <= datos.fin2) {
+                                i++;
+                            }
+                            continue;
+                        }
+                        
+                        // Verificar si hay viaje en esta fecha
                         const viaje = datos.viajes.find(v => {
-                            if (!v.salida) return false;
-                            const fv = new Date(v.salida);
-                            const fs = new Date(s.fecha);
-                            return fv.toDateString() === fs.toDateString();
+                            if (!v.salida || !v.regreso) return false;
+                            const fSalida = new Date(v.salida);
+                            const fRegreso = new Date(v.regreso);
+                            return fechaSesion >= fSalida && fechaSesion <= fRegreso;
                         });
-
+                        
                         if (viaje) {
+                            // Contar sesiones durante el viaje
+                            const fSalida = new Date(viaje.salida);
+                            const fRegreso = new Date(viaje.regreso);
+                            const sesionesEnViaje = sesUni.filter(ses => {
+                                const f = new Date(ses.fecha);
+                                return f >= fSalida && f <= fRegreso;
+                            }).length;
+                            
                             tData.push([{
                                 content: `VIAJE DE PRÁCTICA: ${viaje.destino}`,
-                                colSpan: 7,
-                                styles: { halign: 'center', fontStyle: 'bold', fillColor: [200, 255, 200] }
+                                colSpan: 2,
+                                styles: { halign: 'left', fontStyle: 'bold', fillColor: [200, 255, 200] }
+                            }, {
+                                content: sesionesEnViaje.toString(),
+                                styles: { halign: 'center', fillColor: [200, 255, 200] }
+                            }, {
+                                content: `${fSalida.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})} - ${fRegreso.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}`,
+                                styles: { halign: 'center', fillColor: [200, 255, 200] }
+                            }, {
+                                content: viaje.objetivo || 'Viaje de práctica',
+                                colSpan: 3,
+                                styles: { halign: 'left', fillColor: [200, 255, 200] }
                             }]);
+                            
+                            // Saltar todas las sesiones del viaje
+                            while (i < sesUni.length && new Date(sesUni[i].fecha) <= fRegreso) {
+                                i++;
+                            }
+                            continue;
                         }
-
+                        
+                        // Sesión normal
                         tData.push([
                             `${s.numero}\n${new Date(s.fecha).toLocaleDateString('es-MX')}`,
                             s.conocimientos,
@@ -842,7 +940,9 @@
                             s.recursos,
                             s.evidencias
                         ]);
-                    });
+                        
+                        i++;
+                    }
 
                     doc.autoTable({
                         startY: doc.lastAutoTable.finalY + 5,
