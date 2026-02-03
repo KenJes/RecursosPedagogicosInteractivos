@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inteligencia de Negocios - Caso Práctico Interactivo</title>
+    <style>
+        /* ===========================
+           VARIABLES Y RESET
+        =========================== */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --bg-light: #ecf0f1;
+            --bg-white: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-hover: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===========================
+           CONTENEDOR PRINCIPAL
+        =========================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===========================
+           HEADER Y TÍTULO
+        =========================== */
+        header {
+            background: var(--bg-white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-light);
+            font-size: 1.1em;
+        }
+
+        /* ===========================
+           PANEL DE CONTROL
+        =========================== */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: var(--bg-white);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .metric-label {
+            color: var(--text-light);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .metric-value.positive {
+            color: var(--success-color);
+        }
+
+        .metric-value.negative {
+            color: var(--danger-color);
+        }
+
+        /* ===========================
+           BARRA DE PROGRESO
+        =========================== */
+        .progress-container {
+            background: var(--bg-white);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar-bg {
+            background: var(--bg-light);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--secondary-color));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        /* ===========================
+           ÁREA DE CONTENIDO PRINCIPAL
+        =========================== */
+        .content-area {
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .scenario-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .scenario-title {
+            font-size: 1.8em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 15px;
+        }
+
+        .scenario-description {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        /* ===========================
+           OPCIONES DE DECISIÓN
+        =========================== */
+        .decision-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .decision-button {
+            background: var(--bg-white);
+            border: 2px solid var(--secondary-color);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .decision-button:hover {
+            background: var(--secondary-color);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .decision-button::before {
+            content: "→";
+            position: absolute;
+            right: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .decision-button:hover::before {
+            opacity: 1;
+        }
+
+        /* ===========================
+           FEEDBACK Y PISTAS
+        =========================== */
+        .feedback-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .feedback-box.success {
+            background: #d4edda;
+            border-left-color: var(--success-color);
+        }
+
+        .feedback-box.error {
+            background: #f8d7da;
+            border-left-color: var(--danger-color);
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .socratic-hint {
+            font-style: italic;
+            color: var(--text-dark);
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 5px;
+        }
+
+        /* ===========================
+           CONTROLES DE JUEGO
+        =========================== */
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .control-button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: var(--text-light);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6c7d;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* ===========================
+           MODAL
+        =========================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .modal-text {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        /* ===========================
+           ANIMACIONES
+        =========================== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===========================
+           RESPONSIVE
+        =========================== */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .game-controls {
+                flex-direction: column;
+            }
+        }
+
+        /* ===========================
+           ESTADOS OCULTOS
+        =========================== */
+        .hidden {
+            display: none;
+        }
+
+        /* ===========================
+           FORMULARIO DE REGISTRO
+        =========================== */
+        .registration-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .registration-card {
+            background: var(--bg-white);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .registration-card h2 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--bg-light);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        .form-group input:required:invalid {
+            border-color: var(--bg-light);
+        }
+
+        /* ===========================
+           CERTIFICADO
+        =========================== */
+        .certificate {
+            background: white;
+            padding: 60px;
+            max-width: 800px;
+            margin: 0 auto;
+            border: 15px solid var(--primary-color);
+            box-shadow: 0 0 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .certificate::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            right: 25px;
+            bottom: 25px;
+            border: 2px solid var(--secondary-color);
+        }
+
+        .certificate-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .certificate-title {
+            font-size: 3em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .certificate-subtitle {
+            font-size: 1.3em;
+            color: var(--text-light);
+            margin-bottom: 40px;
+        }
+
+        .certificate-name {
+            font-size: 2.5em;
+            color: var(--secondary-color);
+            margin: 30px 0;
+            font-weight: bold;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            display: inline-block;
+        }
+
+        .certificate-text {
+            font-size: 1.2em;
+            line-height: 2;
+            margin: 30px 0;
+            color: var(--text-dark);
+        }
+
+        .certificate-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .certificate-metric {
+            padding: 15px;
+            background: var(--bg-light);
+            border-radius: 8px;
+        }
+
+        .certificate-metric-label {
+            font-size: 0.9em;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        .certificate-metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .certificate-footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+        }
+
+        .certificate-signature {
+            text-align: center;
+        }
+
+        .certificate-signature-line {
+            border-top: 2px solid var(--text-dark);
+            width: 200px;
+            margin: 10px auto;
+        }
+
+        .certificate-date {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--text-light);
+            font-size: 1em;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container > *:not(.certificate) {
+                display: none !important;
+            }
+            .game-controls {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de Registro -->
+    <div class="registration-screen" id="registration-screen">
+        <div class="registration-card">
+            <h2>🎓 Registro de Estudiante</h2>
+            <form id="registration-form" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="student-name">Nombre Completo *</label>
+                    <input type="text" id="student-name" required placeholder="Ej: Juan Pérez García">
+                </div>
+                <div class="form-group">
+                    <label for="student-id">Matrícula/ID *</label>
+                    <input type="text" id="student-id" required placeholder="Ej: 2024001234">
+                </div>
+                <div class="form-group">
+                    <label for="student-email">Correo Electrónico *</label>
+                    <input type="email" id="student-email" required placeholder="Ej: estudiante@universidad.edu">
+                </div>
+                <button type="button" class="control-button btn-primary" onclick="gameController.registerStudent()" style="width: 100%; padding: 15px;">
+                    Iniciar Caso Práctico
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="container" id="main-container" style="display: none;">
+        <!-- Header -->
+        <header>
+            <h1>Inteligencia de Negocios</h1>
+            <p class="subtitle">Caso Práctico: Transformación Digital de TechSolutions S.A.</p>
+        </header>
+
+        <!-- Dashboard de Métricas -->
+        <div class="dashboard">
+            <div class="metric-card">
+                <div class="metric-label">Capital Actual</div>
+                <div class="metric-value" id="capital">$500,000</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Decisiones Tomadas</div>
+                <div class="metric-value" id="decisions">0/10</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Índice de Satisfacción</div>
+                <div class="metric-value" id="satisfaction">75%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Cuota de Mercado</div>
+                <div class="metric-value" id="marketShare">25%</div>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso -->
+        <div class="progress-container">
+            <div class="progress-header">
+                <span><strong>Progreso del Caso</strong></span>
+                <span id="progress-text">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar" style="width: 0%;">
+                    <span id="progress-percent">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de Contenido Principal -->
+        <div class="content-area" id="content-area">
+            <!-- El contenido se generará dinámicamente -->
+        </div>
+
+        <!-- Controles de Juego -->
+        <div class="game-controls">
+            <button class="control-button btn-success" onclick="gameController.saveProgress()">
+                💾 Guardar Progreso
+            </button>
+            <button class="control-button btn-secondary" onclick="gameController.loadProgress()">
+                📁 Cargar Progreso
+            </button>
+            <button class="control-button btn-danger" onclick="gameController.resetGame()">
+                🔄 Reiniciar
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para resultados finales -->
+    <div class="modal" id="end-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="modal-title">Resultado Final</h2>
+            <p class="modal-text" id="modal-text"></p>
+            <button class="control-button btn-success" onclick="gameController.generateCertificate()" style="margin-right: 10px;">
+                🎓 Generar Certificado
+            </button>
+            <button class="control-button btn-primary" onclick="gameController.resetGame()">
+                Comenzar Nuevo Caso
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para certificado -->
+    <div class="modal" id="certificate-modal">
+        <div class="modal-content" style="max-width: 900px; padding: 20px;">
+            <div class="certificate" id="certificate">
+                <div class="certificate-content">
+                    <div class="certificate-title">Certificado</div>
+                    <div class="certificate-subtitle">de Competencia en Inteligencia de Negocios</div>
+                    
+                    <p class="certificate-text">Se otorga el presente certificado a:</p>
+                    
+                    <div class="certificate-name" id="cert-student-name">Nombre del Estudiante</div>
+                    
+                    <p class="certificate-text" id="cert-description">
+                        Por haber completado exitosamente el caso práctico de Inteligencia de Negocios
+                        "Transformación Digital de TechSolutions S.A.", demostrando competencias en
+                        análisis de datos, toma de decisiones estratégicas y aplicación de metodologías BI.
+                    </p>
+                    
+                    <div class="certificate-metrics">
+                        <div class="certificate-metric">
+                            <div class="certificate-metric-label">Capital Final</div>
+                            <div class="certificate-metric-value" id="cert-capital">$0</div>
+                        </div>
+                        <div class="certificate-metric">
+                            <div class="certificate-metric-label">Satisfacción</div>
+                            <div class="certificate-metric-value" id="cert-satisfaction">0%</div>
+                        </div>
+                        <div class="certificate-metric">
+                            <div class="certificate-metric-label">Cuota Mercado</div>
+                            <div class="certificate-metric-value" id="cert-market">0%</div>
+                        </div>
+                    </div>
+
+                    <p class="certificate-text">
+                        <strong>ID de Estudiante:</strong> <span id="cert-student-id"></span><br>
+                        <strong>ID de Sesión:</strong> <span id="cert-session-id"></span>
+                    </p>
+                    
+                    <div class="certificate-footer">
+                        <div class="certificate-signature">
+                            <div class="certificate-signature-line"></div>
+                            <div>Docente de Inteligencia de Negocios</div>
+                        </div>
+                        <div class="certificate-signature">
+                            <div class="certificate-signature-line"></div>
+                            <div>Coordinación Académica</div>
+                        </div>
+                    </div>
+                    
+                    <div class="certificate-date" id="cert-date"></div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="control-button btn-primary" onclick="window.print()">
+                    🖨️ Imprimir Certificado
+                </button>
+                <button class="control-button btn-secondary" onclick="document.getElementById('certificate-modal').classList.remove('show')">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===================================================
+           GENERADOR PROCEDURAL DE ESCENARIOS
+        =================================================== */
+        
+        class ProceduralGenerator {
+            constructor(seed) {
+                this.seed = seed;
+                this.rng = this.seededRandom(seed);
+            }
+
+            /**
+             * Generador de números aleatorios con semilla
+             */
+            seededRandom(seed) {
+                let state = seed;
+                return function() {
+                    state = (state * 9301 + 49297) % 233280;
+                    return state / 233280;
+                };
+            }
+
+            /**
+             * Selecciona un elemento aleatorio de un array
+             */
+            randomChoice(array) {
+                return array[Math.floor(this.rng() * array.length)];
+            }
+
+            /**
+             * Genera un número aleatorio en un rango
+             */
+            randomRange(min, max) {
+                return Math.floor(this.rng() * (max - min + 1)) + min;
+            }
+
+            /**
+             * Mezcla un array usando Fisher-Yates
+             */
+            shuffle(array) {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(this.rng() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+        }
+
+        /* ===================================================
+           PLANTILLAS PARA GENERACIÓN PROCEDURAL
+        =================================================== */
+        
+        const scenarioTemplates = {
+            companies: ['TechSolutions', 'DataCorp', 'InnovateSoft', 'AnalyticsPro', 'SmartBusiness'],
+            industries: ['retail', 'manufactura', 'servicios financieros', 'salud', 'telecomunicaciones'],
+            problems: [
+                { type: 'decline', desc: 'pérdida del 40% de clientes', impact: 'ingresos decrecientes' },
+                { type: 'competition', desc: 'entrada de competidores disruptivos', impact: 'caída en participación de mercado' },
+                { type: 'obsolescence', desc: 'tecnología obsoleta', impact: 'baja productividad' },
+                { type: 'satisfaction', desc: 'insatisfacción del cliente', impact: 'alta tasa de churn' }
+            ],
+            investments: [
+                { name: 'Big Data', cost: 200000, type: 'tech' },
+                { name: 'CRM Avanzado', cost: 150000, type: 'tech' },
+                { name: 'Machine Learning', cost: 180000, type: 'tech' },
+                { name: 'Dashboard BI', cost: 80000, type: 'analytics' }
+            ],
+            diagnosticOptions: [
+                'análisis de datos históricos',
+                'auditoría de procesos',
+                'benchmarking competitivo',
+                'análisis FODA cuantitativo'
+            ],
+            opportunities: [
+                { sector: 'retail', percentage: 70, service: 'analítica predictiva' },
+                { sector: 'manufactura', percentage: 65, service: 'IoT y análisis de sensores' },
+                { sector: 'finanzas', percentage: 75, service: 'detección de fraude' },
+                { sector: 'salud', percentage: 68, service: 'análisis de datos clínicos' }
+            ]
+        };
+
+        /* ===================================================
+           ESTRUCTURA DE DATOS DEL ESCENARIO BASE
+        =================================================== */
+        
+        const scenarios = {
+            // Escenario inicial
+            start: {
+                id: 'start',
+                title: 'Situación Inicial: Crisis en TechSolutions S.A.',
+                image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800',
+                description: `TechSolutions S.A. es una empresa de desarrollo de software con 15 años en el mercado. 
+                Durante el último año, ha perdido el 40% de sus clientes principales debido a la transformación digital 
+                de la competencia. Los datos actuales indican: ingresos decrecientes, equipos desmotivados y tecnología 
+                obsoleta. El Consejo Directivo le ha nombrado como Director de Inteligencia de Negocios con la misión 
+                de revertir esta situación. Su capital inicial es de $500,000 USD y debe tomar decisiones estratégicas 
+                fundamentadas en análisis de datos.`,
+                question: '¿Cuál debe ser su primera acción como Director de Inteligencia de Negocios?',
+                decisions: [
+                    {
+                        text: 'A) Implementar inmediatamente una solución de Big Data y contratar consultores externos ($200,000)',
+                        impact: { capital: -200000, satisfaction: -10, marketShare: 0 },
+                        feedback: {
+                            type: 'error',
+                            message: 'Decisión apresurada sin diagnóstico previo.',
+                            hint: '¿Es prudente invertir recursos significativos sin comprender primero las causas raíz del problema? Considere el método científico aplicado a los negocios.'
+                        },
+                        nextScenario: 'scenario2_bad'
+                    },
+                    {
+                        text: 'B) Realizar un diagnóstico integral mediante análisis de datos históricos y entrevistas con stakeholders ($30,000)',
+                        impact: { capital: -30000, satisfaction: 10, marketShare: 5 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Excelente decisión. El diagnóstico es fundamental.',
+                            hint: 'Ha aplicado correctamente el primer principio de la Inteligencia de Negocios: comprender antes de actuar.'
+                        },
+                        nextScenario: 'scenario2_good'
+                    },
+                    {
+                        text: 'C) Recortar costos despidiendo al 30% del personal para mejorar las finanzas inmediatamente',
+                        impact: { capital: 50000, satisfaction: -30, marketShare: -10 },
+                        feedback: {
+                            type: 'error',
+                            message: 'Esta medida afecta gravemente el capital humano.',
+                            hint: '¿El problema financiero es de costos o de ingresos? ¿Qué efecto tendrá la pérdida de talento en la capacidad competitiva?'
+                        },
+                        nextScenario: 'scenario2_bad'
+                    }
+                ]
+            },
+
+            // Rama positiva - Escenario 2
+            scenario2_good: {
+                id: 'scenario2_good',
+                title: 'Resultados del Diagnóstico',
+                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800',
+                description: `El diagnóstico revela información crítica: (1) Los clientes abandonan porque la empresa 
+                carece de capacidades de análisis predictivo, (2) Los empleados reportan sistemas obsoletos que reducen 
+                su productividad en 40%, (3) La competencia está utilizando BI para personalizar servicios. El análisis 
+                de mercado muestra una oportunidad en el sector retail, donde el 70% de empresas buscan soluciones de 
+                analítica avanzada. Los datos indican que la inversión en capacitación del personal actual generaría 
+                mayor ROI que la contratación externa.`,
+                question: 'Con base en los hallazgos del diagnóstico, ¿cuál es la estrategia más adecuada?',
+                decisions: [
+                    {
+                        text: 'A) Desarrollar una propuesta de valor especializada en BI para retail, capacitando al equipo actual ($80,000)',
+                        impact: { capital: -80000, satisfaction: 25, marketShare: 15 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Estrategia basada en datos con enfoque de océano azul.',
+                            hint: 'Ha identificado una oportunidad de mercado y alineado los recursos internos correctamente.'
+                        },
+                        nextScenario: 'scenario3_excellent'
+                    },
+                    {
+                        text: 'B) Copiar exactamente lo que hace la competencia líder del mercado',
+                        impact: { capital: -120000, satisfaction: -5, marketShare: 3 },
+                        feedback: {
+                            type: 'error',
+                            message: 'Estrategia me-too sin diferenciación.',
+                            hint: '¿Qué ventaja competitiva ofrece ser el segundo en hacer lo mismo? Reconsidere el concepto de propuesta de valor única.'
+                        },
+                        nextScenario: 'scenario3_bad'
+                    },
+                    {
+                        text: 'C) Diversificar hacia múltiples industrias simultáneamente para reducir riesgo ($150,000)',
+                        impact: { capital: -150000, satisfaction: 5, marketShare: 5 },
+                        feedback: {
+                            type: 'error',
+                            message: 'Recursos insuficientes para diversificación efectiva.',
+                            hint: '¿Es viable competir en múltiples frentes con recursos limitados? Analice el concepto de ventaja competitiva sostenible.'
+                        },
+                        nextScenario: 'scenario3_bad'
+                    }
+                ]
+            },
+
+            // Rama negativa - Escenario 2
+            scenario2_bad: {
+                id: 'scenario2_bad',
+                title: 'Consecuencias de Decisiones Apresuradas',
+                image: 'https://images.unsplash.com/photo-1590508969277-e2a0f8b3f1e5?w=800',
+                description: `Las decisiones tomadas sin fundamento analítico han generado resistencia interna y 
+                desperdicio de recursos. La moral del equipo ha caído significativamente. Los clientes perciben 
+                inestabilidad en la empresa. Sin embargo, aún hay tiempo para rectificar mediante un enfoque más 
+                riguroso basado en metodologías de BI. El mercado sigue demandando soluciones analíticas, pero 
+                su posición competitiva se ha debilitado.`,
+                question: '¿Cómo puede rectificar el rumbo de la empresa?',
+                decisions: [
+                    {
+                        text: 'A) Implementar un dashboard ejecutivo con KPIs críticos y establecer un proceso de toma de decisiones basado en datos ($50,000)',
+                        impact: { capital: -50000, satisfaction: 15, marketShare: 8 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Recuperación mediante metodología estructurada.',
+                            hint: 'La medición y el seguimiento son fundamentales para el control estratégico.'
+                        },
+                        nextScenario: 'scenario3_recovery'
+                    },
+                    {
+                        text: 'B) Continuar con decisiones intuitivas basadas en experiencia sin métricas',
+                        impact: { capital: -80000, satisfaction: -20, marketShare: -15 },
+                        feedback: {
+                            type: 'error',
+                            message: 'La intuición sin datos es especulación.',
+                            hint: '¿Qué diferencia a una empresa orientada por datos de una que opera por intuición? Considere el valor de la evidencia empírica.'
+                        },
+                        nextScenario: 'scenario_bankruptcy'
+                    },
+                    {
+                        text: 'C) Vender activos de la empresa para mantener liquidez',
+                        impact: { capital: 100000, satisfaction: -25, marketShare: -20 },
+                        feedback: {
+                            type: 'error',
+                            message: 'Solución de corto plazo que compromete el futuro.',
+                            hint: '¿Resolver problemas estructurales con medidas financieras es sostenible? Reflexione sobre causas versus síntomas.'
+                        },
+                        nextScenario: 'scenario_bankruptcy'
+                    }
+                ]
+            },
+
+            // Escenario 3 - Excelente trayectoria
+            scenario3_excellent: {
+                id: 'scenario3_excellent',
+                title: 'Consolidación de la Estrategia BI',
+                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800',
+                description: `La estrategia especializada en retail está mostrando resultados. Han cerrado 3 contratos 
+                importantes por $180,000. El equipo está motivado con las nuevas capacidades adquiridas. Sin embargo, 
+                surge una disyuntiva: un cliente solicita implementar Machine Learning para predicción de demanda, 
+                tecnología que su equipo aún no domina completamente. Otra opción es consolidar las operaciones 
+                actuales antes de expandir servicios.`,
+                question: 'La empresa está en crecimiento. ¿Cuál es la mejor decisión para maximizar el valor a largo plazo?',
+                decisions: [
+                    {
+                        text: 'A) Aceptar el proyecto de ML, subcontratando expertos mientras el equipo aprende en paralelo ($60,000 inversión, +$120,000 ingresos)',
+                        impact: { capital: 60000, satisfaction: 15, marketShare: 10 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Crecimiento controlado con gestión de riesgo.',
+                            hint: 'Ha balanceado oportunidad con desarrollo de capacidades internas.'
+                        },
+                        nextScenario: 'scenario4_success'
+                    },
+                    {
+                        text: 'B) Rechazar el proyecto y consolidar las operaciones actuales',
+                        impact: { capital: 0, satisfaction: 10, marketShare: 5 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Enfoque conservador pero seguro.',
+                            hint: 'A veces no aceptar nuevos retos permite fortalecer lo existente.'
+                        },
+                        nextScenario: 'scenario4_moderate'
+                    },
+                    {
+                        text: 'C) Aceptar el proyecto sin experiencia previa, prometiendo resultados sin subcontratación',
+                        impact: { capital: -100000, satisfaction: -30, marketShare: -10 },
+                        feedback: {
+                            type: 'error',
+                            message: 'Sobrepromesa sin capacidad de ejecución.',
+                            hint: '¿Es ético comprometerse a entregar soluciones sin contar con las competencias necesarias? Considere el riesgo reputacional.'
+                        },
+                        nextScenario: 'scenario_bankruptcy'
+                    }
+                ]
+            },
+
+            // Escenario 3 - Recuperación
+            scenario3_recovery: {
+                id: 'scenario3_recovery',
+                title: 'Reconstruyendo con Metodología',
+                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800',
+                description: `El dashboard implementado ha traído visibilidad sobre las operaciones. Los KPIs muestran 
+                que: (1) el tiempo de respuesta a clientes se redujo 30%, (2) la precisión en estimaciones mejoró 45%, 
+                (3) se identificaron 3 procesos críticos con ineficiencias. Un análisis de correlación revela que los 
+                proyectos de $50,000-$80,000 tienen la mejor tasa de éxito (92%) versus proyectos grandes (60%). 
+                Debe decidir el tamaño ideal de proyectos para maximizar rentabilidad.`,
+                question: 'Los datos sugieren un patrón claro. ¿Cómo debe ajustar la estrategia comercial?',
+                decisions: [
+                    {
+                        text: 'A) Enfocar esfuerzos comerciales en proyectos de rango medio ($50-80k) donde la tasa de éxito es mayor',
+                        impact: { capital: 90000, satisfaction: 20, marketShare: 12 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Decisión basada en análisis estadístico riguroso.',
+                            hint: 'Ha aplicado correctamente el análisis de datos para optimizar la estrategia comercial.'
+                        },
+                        nextScenario: 'scenario4_success'
+                    },
+                    {
+                        text: 'B) Ignorar los datos y continuar con la estrategia anterior',
+                        impact: { capital: 20000, satisfaction: -10, marketShare: 2 },
+                        feedback: {
+                            type: 'error',
+                            message: '¿Para qué invertir en BI si no se utilizan los insights?',
+                            hint: 'El valor de la inteligencia de negocios radica en la acción basada en los hallazgos.'
+                        },
+                        nextScenario: 'scenario4_moderate'
+                    }
+                ]
+            },
+
+            // Escenario 4 - Éxito consolidado
+            scenario4_success: {
+                id: 'scenario4_success',
+                title: 'Expansión y Escalamiento',
+                image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800',
+                description: `TechSolutions ha triplicado su cartera de clientes y su cuota de mercado alcanzó 40%. 
+                El equipo de BI está generando insights que agregan valor real. Aparece una oportunidad de adquisición: 
+                una startup de visualización de datos está en venta por $150,000. Sus capacidades complementarían 
+                perfectamente su oferta, pero también podría desarrollar esas capacidades internamente por $80,000 
+                en 6 meses. Los datos de mercado muestran que el 65% de adquisiciones similares generan sinergias 
+                positivas dentro de los primeros 18 meses.`,
+                question: 'Decisión estratégica de crecimiento: ¿comprar o construir?',
+                decisions: [
+                    {
+                        text: 'A) Adquirir la startup aprovechando las sinergias y reduciendo el time-to-market',
+                        impact: { capital: -150000, satisfaction: 20, marketShare: 15 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Estrategia de M&A fundamentada en análisis de riesgo-beneficio.',
+                            hint: 'Ha evaluado correctamente el valor del tiempo y las sinergias.'
+                        },
+                        nextScenario: 'scenario_victory'
+                    },
+                    {
+                        text: 'B) Desarrollar las capacidades internamente manteniendo control total',
+                        impact: { capital: -80000, satisfaction: 15, marketShare: 10 },
+                        feedback: {
+                            type: 'success',
+                            message: 'Enfoque orgánico con menor riesgo financiero.',
+                            hint: 'El desarrollo interno preserva la cultura y reduce dependencias.'
+                        },
+                        nextScenario: 'scenario_victory'
+                    },
+                    {
+                        text: 'C) No invertir en nuevas capacidades y mantener el status quo',
+                        impact: { capital: 0, satisfaction: -10, marketShare: -5 },
+                        feedback: {
+                            type: 'error',
+                            message: 'La complacencia es el enemigo del crecimiento sostenible.',
+                            hint: '¿Qué sucede con empresas que no innovan en mercados dinámicos? Considere el concepto de ventaja competitiva temporal.'
+                        },
+                        nextScenario: 'scenario4_moderate'
+                    }
+                ]
+            },
+
+            // Escenario 4 - Moderado
+            scenario4_moderate: {
+                id: 'scenario4_moderate',
+                title: 'Estabilidad con Potencial Limitado',
+                image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800',
+                description: `La empresa se ha estabilizado con un crecimiento moderado. El capital está seguro pero 
+                el potencial de expansión es limitado. La competencia está innovando agresivamente. Sus clientes 
+                actuales están satisfechos pero no entusiasmados. Los indicadores sugieren que sin un movimiento 
+                estratégico significativo, la empresa se estancará. Un análisis FODA revela que tiene fortalezas 
+                operativas pero debilidades en innovación.`,
+                question: 'La empresa está en zona de confort. ¿Cuál es la decisión más prudente?',
+                decisions: [
+                    {
+                        text: 'A) Invertir en I+D para desarrollar soluciones innovadoras basadas en IA y analítica avanzada ($100,000)',
+                        impact: { capital: -100000, satisfaction: 25, marketShare: 15 },
+                        feedback: {
+                            type: 'success',
+                            message: 'La innovación es el motor del crecimiento futuro.',
+                            hint: 'Ha reconocido que la estabilidad sin innovación es insostenible a largo plazo.'
+                        },
+                        nextScenario: 'scenario_victory'
+                    },
+                    {
+                        text: 'B) Mantener operaciones actuales sin cambios significativos',
+                        impact: { capital: 0, satisfaction: -15, marketShare: -10 },
+                        feedback: {
+                            type: 'error',
+                            message: 'El mercado no perdona la inacción.',
+                            hint: '¿Qué sucede con las empresas que se quedan quietas mientras el entorno cambia? Reflexione sobre adaptación versus extinción.'
+                        },
+                        nextScenario: 'scenario_bankruptcy'
+                    }
+                ]
+            },
+
+            // Escenario de quiebra
+            scenario_bankruptcy: {
+                id: 'scenario_bankruptcy',
+                title: 'Quiebra Empresarial',
+                image: 'https://images.unsplash.com/photo-1554224311-beee1ade88e5?w=800',
+                description: `Las decisiones tomadas sin fundamento analítico, la falta de planificación estratégica 
+                y la ausencia de metodologías de inteligencia de negocios han llevado a TechSolutions a la quiebra. 
+                El capital se agotó, los clientes abandonaron la empresa y la cuota de mercado desapareció. Este 
+                resultado demuestra la importancia crítica de la toma de decisiones basada en datos, el análisis 
+                riguroso y la aplicación de metodologías de BI en la gestión empresarial moderna. Las empresas que 
+                no adoptan una cultura data-driven están condenadas al fracaso en el entorno competitivo actual.`,
+                question: null,
+                decisions: [],
+                isEnding: true,
+                endingType: 'bankruptcy'
+            },
+
+            // Escenario de victoria
+            scenario_victory: {
+                id: 'scenario_victory',
+                title: '¡Transformación Exitosa!',
+                image: 'https://images.unsplash.com/photo-1569025690938-a00729c9e1f9?w=800',
+                description: `¡Excelente trabajo! TechSolutions S.A. ha completado una transformación digital exitosa. 
+                La empresa ha triplicado su valoración, expandido su cuota de mercado al 55%, y se ha posicionado 
+                como líder en soluciones de inteligencia de negocios para el sector retail. Las decisiones 
+                fundamentadas en análisis de datos, la implementación de metodologías BI rigurosas, y el enfoque 
+                estratégico han sido clave para este éxito. Ha demostrado competencia en: análisis diagnóstico, 
+                identificación de oportunidades de mercado, gestión de riesgos, desarrollo de capacidades internas, 
+                y toma de decisiones basada en evidencia. Este caso ejemplifica cómo la inteligencia de negocios 
+                aplicada correctamente puede transformar organizaciones y crear ventajas competitivas sostenibles.`,
+                question: null,
+                decisions: [],
+                isEnding: true,
+                endingType: 'victory'
+            }
+        };
+
+        /* ===================================================
+           CLASE CONTROLADOR DEL JUEGO
+        =================================================== */
+        class GameController {
+            constructor() {
+                this.studentData = null;
+                this.sessionId = null;
+                this.proceduralGen = null;
+                this.gameState = {
+                    currentScenario: 'start',
+                    capital: 500000,
+                    satisfaction: 75,
+                    marketShare: 25,
+                    decisionsCount: 0,
+                    maxDecisions: 10,
+                    history: [],
+                    startTime: null,
+                    endTime: null
+                };
+                // No inicializar hasta que el estudiante se registre
+            }
+
+            /**
+             * Registra un nuevo estudiante y genera su caso único
+             */
+            registerStudent() {
+                const name = document.getElementById('student-name').value.trim();
+                const id = document.getElementById('student-id').value.trim();
+                const email = document.getElementById('student-email').value.trim();
+
+                if (!name || !id || !email) {
+                    alert('⚠️ Por favor complete todos los campos');
+                    return;
+                }
+
+                // Crear datos del estudiante
+                this.studentData = { name, id, email };
+                
+                // Generar ID de sesión único basado en estudiante + timestamp
+                this.sessionId = this.generateSessionId(id);
+                
+                // Generar semilla única para cada estudiante
+                const seed = this.generateSeed(id);
+                this.proceduralGen = new ProceduralGenerator(seed);
+                
+                // Generar escenarios procedurales únicos
+                this.generateProceduralScenarios();
+                
+                // Ocultar pantalla de registro y mostrar juego
+                document.getElementById('registration-screen').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+                
+                // Inicializar el juego
+                this.gameState.startTime = new Date().toISOString();
+                this.initialize();
+                
+                console.log(`Estudiante registrado: ${name} (${id})`);
+                console.log(`Semilla de generación: ${seed}`);
+                console.log(`ID de sesión: ${this.sessionId}`);
+            }
+
+            /**
+             * Genera un ID de sesión único
+             */
+            generateSessionId(studentId) {
+                const timestamp = Date.now();
+                const hash = this.simpleHash(studentId + timestamp);
+                return `BI-${studentId}-${hash.toString(36).toUpperCase()}`;
+            }
+
+            /**
+             * Genera una semilla única basada en el ID del estudiante
+             */
+            generateSeed(studentId) {
+                return this.simpleHash(studentId);
+            }
+
+            /**
+             * Hash simple para generar semillas
+             */
+            simpleHash(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash);
+            }
+
+            /**
+             * Genera escenarios procedurales únicos para cada estudiante
+             */
+            generateProceduralScenarios() {
+                const gen = this.proceduralGen;
+                
+                // Personalizar escenario inicial
+                const company = gen.randomChoice(scenarioTemplates.companies);
+                const problem = gen.randomChoice(scenarioTemplates.problems);
+                const initialCapital = gen.randomRange(400000, 600000);
+                
+                // Actualizar valores iniciales
+                this.gameState.capital = initialCapital;
+                this.gameState.satisfaction = gen.randomRange(70, 80);
+                this.gameState.marketShare = gen.randomRange(20, 30);
+                
+                // Modificar el escenario inicial
+                scenarios.start.title = `Situación Inicial: Crisis en ${company} S.A.`;
+                scenarios.start.description = `${company} S.A. es una empresa de desarrollo de software con ${gen.randomRange(10, 20)} años en el mercado. 
+                Durante el último año, ha experimentado ${problem.desc} debido a ${problem.impact}. 
+                Los datos actuales indican: ingresos decrecientes, equipos desmotivados y necesidad de transformación. 
+                El Consejo Directivo le ha nombrado como Director de Inteligencia de Negocios con la misión 
+                de revertir esta situación. Su capital inicial es de $${initialCapital.toLocaleString()} USD y debe tomar decisiones estratégicas 
+                fundamentadas en análisis de datos.`;
+                
+                // Aleatorizar costos de inversiones
+                const investment = gen.randomChoice(scenarioTemplates.investments);
+                const diagnosticCost = gen.randomRange(25000, 40000);
+                const costCutSavings = gen.randomRange(40000, 60000);
+                
+                scenarios.start.decisions[0].text = `A) Implementar inmediatamente ${investment.name} y contratar consultores externos ($${investment.cost.toLocaleString()})`;
+                scenarios.start.decisions[0].impact.capital = -investment.cost;
+                
+                scenarios.start.decisions[1].text = `B) Realizar un diagnóstico integral mediante ${gen.randomChoice(scenarioTemplates.diagnosticOptions)} ($${diagnosticCost.toLocaleString()})`;
+                scenarios.start.decisions[1].impact.capital = -diagnosticCost;
+                
+                scenarios.start.decisions[2].impact.capital = costCutSavings;
+                
+                // Personalizar escenario 2_good con oportunidad aleatoria
+                const opportunity = gen.randomChoice(scenarioTemplates.opportunities);
+                scenarios.scenario2_good.description = scenarios.scenario2_good.description.replace(
+                    'sector retail, donde el 70%',
+                    `sector ${opportunity.sector}, donde el ${opportunity.percentage}%`
+                );
+                scenarios.scenario2_good.description = scenarios.scenario2_good.description.replace(
+                    'analítica avanzada',
+                    opportunity.service
+                );
+                
+                // Aleatorizar costos de decisiones en escenarios posteriores
+                const trainingCost = gen.randomRange(70000, 100000);
+                const competitionCost = gen.randomRange(110000, 140000);
+                const diversificationCost = gen.randomRange(140000, 170000);
+                
+                scenarios.scenario2_good.decisions[0].impact.capital = -trainingCost;
+                scenarios.scenario2_good.decisions[1].impact.capital = -competitionCost;
+                scenarios.scenario2_good.decisions[2].impact.capital = -diversificationCost;
+                
+                scenarios.scenario2_good.decisions[0].text = scenarios.scenario2_good.decisions[0].text.replace(
+                    '$80,000',
+                    `$${trainingCost.toLocaleString()}`
+                );
+                scenarios.scenario2_good.decisions[1].text = scenarios.scenario2_good.decisions[1].text.replace(
+                    '$120,000',
+                    `$${competitionCost.toLocaleString()}`
+                );
+                scenarios.scenario2_good.decisions[2].text = scenarios.scenario2_good.decisions[2].text.replace(
+                    '$150,000',
+                    `$${diversificationCost.toLocaleString()}`
+                );
+                
+                // Mezclar el orden de las decisiones en algunos escenarios
+                Object.keys(scenarios).forEach(key => {
+                    if (scenarios[key].decisions && scenarios[key].decisions.length > 1) {
+                        // 50% de probabilidad de mezclar
+                        if (gen.rng() > 0.5) {
+                            scenarios[key].decisions = gen.shuffle(scenarios[key].decisions);
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Inicializa el juego cargando el primer escenario
+             */
+            initialize() {
+                this.loadScenario('start');
+            }
+
+            /**
+             * Carga un escenario específico y actualiza la UI
+             */
+            loadScenario(scenarioId) {
+                const scenario = scenarios[scenarioId];
+                if (!scenario) {
+                    console.error('Escenario no encontrado:', scenarioId);
+                    return;
+                }
+
+                this.gameState.currentScenario = scenarioId;
+                this.renderScenario(scenario);
+                
+                // Verificar si es un escenario final
+                if (scenario.isEnding) {
+                    this.handleEndGame(scenario);
+                }
+            }
+
+            /**
+             * Renderiza el escenario actual en el DOM
+             */
+            renderScenario(scenario) {
+                const contentArea = document.getElementById('content-area');
+                
+                let html = `
+                    <img src="${scenario.image}" alt="${scenario.title}" class="scenario-image" 
+                         onerror="this.src='https://via.placeholder.com/800x400/667eea/ffffff?text=TechSolutions'">
+                    <h2 class="scenario-title">${scenario.title}</h2>
+                    <p class="scenario-description">${scenario.description}</p>
+                `;
+
+                if (scenario.question) {
+                    html += `
+                        <div style="margin: 30px 0;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 20px;">
+                                ${scenario.question}
+                            </h3>
+                        </div>
+                    `;
+                }
+
+                if (scenario.decisions && scenario.decisions.length > 0) {
+                    html += '<div class="decision-options">';
+                    scenario.decisions.forEach((decision, index) => {
+                        html += `
+                            <button class="decision-button" onclick="gameController.makeDecision(${index})">
+                                ${decision.text}
+                            </button>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                html += '<div class="feedback-box" id="feedback-box"></div>';
+                
+                contentArea.innerHTML = html;
+            }
+
+            /**
+             * Procesa una decisión tomada por el estudiante
+             */
+            makeDecision(decisionIndex) {
+                const scenario = scenarios[this.gameState.currentScenario];
+                const decision = scenario.decisions[decisionIndex];
+
+                // Registrar decisión en historial
+                this.gameState.history.push({
+                    scenario: this.gameState.currentScenario,
+                    decision: decisionIndex,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Aplicar impactos
+                this.applyImpacts(decision.impact);
+                
+                // Mostrar feedback
+                this.showFeedback(decision.feedback);
+                
+                // Incrementar contador de decisiones
+                this.gameState.decisionsCount++;
+                this.updateMetrics();
+
+                // Verificar condiciones de fin de juego
+                if (this.checkGameOver()) {
+                    return;
+                }
+
+                // Cargar siguiente escenario después de un delay
+                setTimeout(() => {
+                    this.loadScenario(decision.nextScenario);
+                }, 3000);
+            }
+
+            /**
+             * Aplica los impactos de una decisión al estado del juego
+             */
+            applyImpacts(impact) {
+                this.gameState.capital += impact.capital || 0;
+                this.gameState.satisfaction += impact.satisfaction || 0;
+                this.gameState.marketShare += impact.marketShare || 0;
+
+                // Limitar valores entre rangos lógicos
+                this.gameState.satisfaction = Math.max(0, Math.min(100, this.gameState.satisfaction));
+                this.gameState.marketShare = Math.max(0, Math.min(100, this.gameState.marketShare));
+            }
+
+            /**
+             * Muestra el feedback de una decisión
+             */
+            showFeedback(feedback) {
+                const feedbackBox = document.getElementById('feedback-box');
+                
+                let feedbackClass = 'success';
+                if (feedback.type === 'error') feedbackClass = 'error';
+                
+                feedbackBox.className = `feedback-box show ${feedbackClass}`;
+                feedbackBox.innerHTML = `
+                    <div class="feedback-title">${feedback.message}</div>
+                    <div class="socratic-hint">
+                        <strong>💡 Reflexión Socrática:</strong><br>
+                        ${feedback.hint}
+                    </div>
+                `;
+            }
+
+            /**
+             * Actualiza las métricas visuales en el dashboard
+             */
+            updateMetrics() {
+                // Actualizar capital
+                const capitalEl = document.getElementById('capital');
+                capitalEl.textContent = `$${this.gameState.capital.toLocaleString()}`;
+                capitalEl.className = 'metric-value';
+                if (this.gameState.capital > 500000) {
+                    capitalEl.classList.add('positive');
+                } else if (this.gameState.capital < 200000) {
+                    capitalEl.classList.add('negative');
+                }
+
+                // Actualizar decisiones
+                document.getElementById('decisions').textContent = 
+                    `${this.gameState.decisionsCount}/${this.gameState.maxDecisions}`;
+
+                // Actualizar satisfacción
+                const satisfactionEl = document.getElementById('satisfaction');
+                satisfactionEl.textContent = `${this.gameState.satisfaction}%`;
+                satisfactionEl.className = 'metric-value';
+                if (this.gameState.satisfaction >= 70) {
+                    satisfactionEl.classList.add('positive');
+                } else if (this.gameState.satisfaction < 50) {
+                    satisfactionEl.classList.add('negative');
+                }
+
+                // Actualizar cuota de mercado
+                const marketEl = document.getElementById('marketShare');
+                marketEl.textContent = `${this.gameState.marketShare}%`;
+                marketEl.className = 'metric-value';
+                if (this.gameState.marketShare >= 30) {
+                    marketEl.classList.add('positive');
+                } else if (this.gameState.marketShare < 15) {
+                    marketEl.classList.add('negative');
+                }
+
+                // Actualizar barra de progreso
+                const progress = (this.gameState.decisionsCount / this.gameState.maxDecisions) * 100;
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
+                document.getElementById('progress-text').textContent = `${Math.round(progress)}%`;
+            }
+
+            /**
+             * Verifica si el juego ha terminado
+             */
+            checkGameOver() {
+                // Verificar quiebra por capital
+                if (this.gameState.capital <= 0) {
+                    this.loadScenario('scenario_bankruptcy');
+                    return true;
+                }
+
+                // Verificar quiebra por métricas críticas
+                if (this.gameState.satisfaction <= 10 || this.gameState.marketShare <= 5) {
+                    this.loadScenario('scenario_bankruptcy');
+                    return true;
+                }
+
+                return false;
+            }
+
+            /**
+             * Maneja el final del juego
+             */
+            handleEndGame(scenario) {
+                this.gameState.endTime = new Date().toISOString();
+                
+                const modal = document.getElementById('end-modal');
+                const modalTitle = document.getElementById('modal-title');
+                const modalText = document.getElementById('modal-text');
+
+                if (scenario.endingType === 'victory') {
+                    modalTitle.textContent = '🎉 ¡Transformación Exitosa!';
+                    modalTitle.style.color = 'var(--success-color)';
+                    modalText.innerHTML = `
+                        <strong>Capital Final:</strong> $${this.gameState.capital.toLocaleString()}<br>
+                        <strong>Satisfacción:</strong> ${this.gameState.satisfaction}%<br>
+                        <strong>Cuota de Mercado:</strong> ${this.gameState.marketShare}%<br><br>
+                        Ha demostrado excelente comprensión de los principios de Inteligencia de Negocios. 
+                        Sus decisiones fundamentadas en datos han llevado a la empresa al éxito.
+                        <br><br>
+                        <strong>¡Felicitaciones ${this.studentData.name}!</strong>
+                    `;
+                } else if (scenario.endingType === 'bankruptcy') {
+                    modalTitle.textContent = '❌ Quiebra Empresarial';
+                    modalTitle.style.color = 'var(--danger-color)';
+                    modalText.innerHTML = `
+                        <strong>Capital Final:</strong> $${this.gameState.capital.toLocaleString()}<br>
+                        <strong>Satisfacción:</strong> ${this.gameState.satisfaction}%<br>
+                        <strong>Cuota de Mercado:</strong> ${this.gameState.marketShare}%<br><br>
+                        Las decisiones sin fundamento analítico han llevado a la empresa al fracaso. 
+                        Es fundamental aplicar metodologías de BI y tomar decisiones basadas en datos.
+                        <br><br>
+                        Puede generar un certificado de participación o intentar nuevamente.
+                    `;
+                }
+
+                modal.classList.add('show');
+            }
+
+            /**
+             * Genera el certificado de competencia
+             */
+            generateCertificate() {
+                // Cerrar modal de resultados
+                document.getElementById('end-modal').classList.remove('show');
+                
+                // Llenar datos del certificado
+                document.getElementById('cert-student-name').textContent = this.studentData.name;
+                document.getElementById('cert-student-id').textContent = this.studentData.id;
+                document.getElementById('cert-session-id').textContent = this.sessionId;
+                document.getElementById('cert-capital').textContent = `$${this.gameState.capital.toLocaleString()}`;
+                document.getElementById('cert-satisfaction').textContent = `${this.gameState.satisfaction}%`;
+                document.getElementById('cert-market').textContent = `${this.gameState.marketShare}%`;
+                
+                // Ajustar descripción según resultado
+                const scenario = scenarios[this.gameState.currentScenario];
+                let description = '';
+                if (scenario.endingType === 'victory') {
+                    description = `Por haber completado exitosamente el caso práctico de Inteligencia de Negocios
+                        "Transformación Digital", demostrando excelentes competencias en
+                        análisis de datos, toma de decisiones estratégicas y aplicación de metodologías BI,
+                        logrando transformar la organización y alcanzar resultados sobresalientes.`;
+                } else {
+                    description = `Por haber participado en el caso práctico de Inteligencia de Negocios
+                        "Transformación Digital", demostrando dedicación en el análisis de
+                        situaciones empresariales complejas y aplicación de conceptos de BI.`;
+                }
+                document.getElementById('cert-description').textContent = description;
+                
+                // Fecha actual
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('es-ES', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                document.getElementById('cert-date').textContent = 
+                    `Emitido el ${dateStr}`;
+                
+                // Mostrar modal de certificado
+                document.getElementById('certificate-modal').classList.add('show');
+                
+                // Guardar en localStorage para auditoría
+                this.saveCertificateData();
+            }
+
+            /**
+             * Guarda datos del certificado para auditoría
+             */
+            saveCertificateData() {
+                const certificateData = {
+                    student: this.studentData,
+                    sessionId: this.sessionId,
+                    gameState: this.gameState,
+                    timestamp: new Date().toISOString(),
+                    duration: this.calculateDuration()
+                };
+                
+                // Guardar en localStorage
+                const allCertificates = JSON.parse(localStorage.getItem('bi_certificates') || '[]');
+                allCertificates.push(certificateData);
+                localStorage.setItem('bi_certificates', JSON.stringify(allCertificates));
+                
+                console.log('Certificado guardado:', certificateData);
+            }
+
+            /**
+             * Calcula la duración del ejercicio
+             */
+            calculateDuration() {
+                if (!this.gameState.startTime || !this.gameState.endTime) return 0;
+                const start = new Date(this.gameState.startTime);
+                const end = new Date(this.gameState.endTime);
+                return Math.round((end - start) / 60000); // minutos
+            }
+
+            /**
+             * Guarda el progreso en localStorage
+             */
+            saveProgress() {
+                try {
+                    const saveData = {
+                        gameState: this.gameState,
+                        timestamp: new Date().toISOString()
+                    };
+                    localStorage.setItem('techsolutions_save', JSON.stringify(saveData));
+                    alert('✅ Progreso guardado exitosamente');
+                } catch (error) {
+                    alert('❌ Error al guardar el progreso');
+                    console.error(error);
+                }
+            }
+
+            /**
+             * Carga el progreso desde localStorage
+             */
+            loadProgress() {
+                try {
+                    const saveData = localStorage.getItem('techsolutions_save');
+                    if (!saveData) {
+                        alert('ℹ️ No se encontró ningún progreso guardado');
+                        return;
+                    }
+
+                    const data = JSON.parse(saveData);
+                    this.gameState = data.gameState;
+                    this.loadScenario(this.gameState.currentScenario);
+                    this.updateMetrics();
+                    alert('✅ Progreso cargado exitosamente');
+                } catch (error) {
+                    alert('❌ Error al cargar el progreso');
+                    console.error(error);
+                }
+            }
+
+            /**
+             * Reinicia el juego completamente
+             */
+            resetGame() {
+                if (confirm('¿Está seguro de que desea reiniciar el caso? Se perderá todo el progreso.')) {
+                    // Cerrar modales si están abiertos
+                    document.getElementById('end-modal').classList.remove('show');
+                    document.getElementById('certificate-modal').classList.remove('show');
+                    
+                    // Mostrar pantalla de registro nuevamente
+                    document.getElementById('main-container').style.display = 'none';
+                    document.getElementById('registration-screen').style.display = 'flex';
+                    
+                    // Limpiar formulario
+                    document.getElementById('registration-form').reset();
+                    
+                    // Reiniciar todos los datos
+                    this.studentData = null;
+                    this.sessionId = null;
+                    this.proceduralGen = null;
+                    
+                    this.gameState = {
+                        currentScenario: 'start',
+                        capital: 500000,
+                        satisfaction: 75,
+                        marketShare: 25,
+                        decisionsCount: 0,
+                        maxDecisions: 10,
+                        history: [],
+                        startTime: null,
+                        endTime: null
+                    };
+                }
+            }
+        }
+
+        /* ===================================================
+           INICIALIZACIÓN
+        =================================================== */
+        // Crear instancia global del controlador
+        const gameController = new GameController();
+
+        // Prevenir recarga accidental
+        window.addEventListener('beforeunload', (e) => {
+            if (gameController.gameState.decisionsCount > 0) {
+                e.preventDefault();
+                e.returnValue = '¿Está seguro de que desea salir? Su progreso se perderá.';
+            }
+        });
+
+        // Permitir Enter para enviar el formulario de registro
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('#registration-form input');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        gameController.registerStudent();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
