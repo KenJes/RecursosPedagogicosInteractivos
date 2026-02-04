@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Generador de Megaprompts — Recursos Pedagógicos Interactivos</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- html2pdf para exportar a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js" defer></script>
+  <script type="module" src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Generador de Megaprompts</h1>
+    <p class="subtitle">Crea megaprompts para generar recursos pedagógicos interactivos en la web</p>
+  </header>
+
+  <main class="container">
+    <section class="card form-card">
+      <h2>Parámetros del recurso</h2>
+
+      <!-- Banner de sugerencias -->
+      <div class="format-suggestions">
+        <h3>Ideas de Formatos Interactivos</h3>
+        <p style="font-size:0.85rem;color:var(--muted);margin:6px 0 10px 0;">Haz clic en una sugerencia para explorar ese tipo de actividad:</p>
+        <div class="suggestion-grid">
+          <div class="suggestion-item" data-format="gamification">🎮 Gamificación (puntos, badges, niveles)</div>
+          <div class="suggestion-item" data-format="sandbox">🧪 Sandbox / Laboratorio virtual</div>
+          <div class="suggestion-item" data-format="decision-tree">🌳 Árbol de decisiones</div>
+          <div class="suggestion-item" data-format="simulation">🔬 Simulación interactiva</div>
+          <div class="suggestion-item" data-format="quiz">❓ Quiz dinámico con feedback</div>
+          <div class="suggestion-item" data-format="storytelling">📖 Narrativa ramificada</div>
+          <div class="suggestion-item" data-format="drag-drop">🖱️ Arrastrar y soltar</div>
+          <div class="suggestion-item" data-format="timeline">⏱️ Línea de tiempo interactiva</div>
+          <div class="suggestion-item" data-format="map">🗺️ Mapa conceptual/mental</div>
+          <div class="suggestion-item" data-format="code-editor">💻 Editor de código en vivo</div>
+          <div class="suggestion-item" data-format="puzzle">🧩 Rompecabezas / Puzzle lógico</div>
+          <div class="suggestion-item" data-format="card-match">🃏 Juego de memoria/emparejar</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <label class="field">
+          <div class="field-header">
+            <span>Título del recurso</span>
+            <span class="help-icon" data-tooltip="title-help">?</span>
+            <div class="tooltip" id="title-help">
+              <div class="tooltip-title">💡 Consejos para el título</div>
+              <div>Dale un nombre atractivo y descriptivo que refleje el tema principal.</div>
+              <div class="tooltip-examples">
+                <strong>Ejemplos:</strong><br>
+                • "Viaje por el Sistema Solar"<br>
+                • "Detective de Fracciones"<br>
+                • "Laboratorio Químico Virtual"
+              </div>
+            </div>
+          </div>
+          <input id="title" placeholder="Ej. Explorando la fotosíntesis" />
+        </label>
+
+        <label class="field">
+          <span>Materia / Tema</span>
+          <input id="subject" placeholder="Ciencias, Matemáticas, Lengua..." />
+        </label>
+
+        <label class="field">
+          <span>Rango de edad / curso</span>
+          <input id="ageRange" placeholder="Ej. 10-12 años / 5º primaria" />
+        </label>
+
+        <label class="field">
+          <span>Duración estimada</span>
+          <input id="duration" placeholder="Ej. 20 minutos" />
+        </label>
+
+        <label class="field full">
+          <span>Objetivos de aprendizaje (separados por punto y coma)</span>
+          <textarea id="objectives" rows="3" placeholder="Ej. Comprender...; Identificar..."></textarea>
+        </label>
+
+        <label class="field">
+          <div class="field-header">
+            <span>Formato deseado</span>
+            <span class="help-icon" data-tooltip="format-help">?</span>
+            <div class="tooltip" id="format-help">
+              <div class="tooltip-title">🎯 Tipos de formatos</div>
+              <div>Elige el formato que mejor se adapte a tus objetivos de aprendizaje.</div>
+              <div class="tooltip-examples">
+                <strong>Opciones populares:</strong><br>
+                • <strong>Gamificación:</strong> Sistema de puntos, logros y rankings<br>
+                • <strong>Sandbox:</strong> Experimentación libre sin consecuencias<br>
+                • <strong>Árbol de decisiones:</strong> Escenarios con múltiples caminos<br>
+                • <strong>Quiz interactivo:</strong> Preguntas con feedback inmediato
+              </div>
+            </div>
+          </div>
+          <select id="format">
+            <option>Actividad interactiva web (HTML/CSS/JS)</option>
+            <option>Juego breve (puntos, niveles)</option>
+            <option>Cuestionario interactivo</option>
+            <option>Simulación / Laboratorio virtual</option>
+            <option>Mapa conceptual interactivo</option>
+            <option>Árbol de decisiones / Escenario ramificado</option>
+            <option>Narrativa interactiva (storytelling)</option>
+            <option>Sandbox / Entorno de experimentación</option>
+            <option>Juego de arrastrar y soltar</option>
+            <option>Línea de tiempo interactiva</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Nivel de dificultad</span>
+          <select id="difficulty">
+            <option>Fácil</option>
+            <option>Intermedio</option>
+            <option>Avanzado</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Lenguaje</span>
+          <select id="language">
+            <option>Español</option>
+            <option>Inglés</option>
+            <option>Otro</option>
+          </select>
+        </label>
+
+        <label class="field full">
+          <div class="field-header">
+            <span>Metodologías pedagógicas (separadas por coma)</span>
+            <span class="help-icon" data-tooltip="method-help">?</span>
+            <div class="tooltip" id="method-help">
+              <div class="tooltip-title">📚 Metodologías disponibles</div>
+              <div>Combina diferentes enfoques pedagógicos para enriquecer la experiencia.</div>
+              <div class="tooltip-examples">
+                <strong>Ideas:</strong><br>
+                • gamificación, aprendizaje basado en juegos<br>
+                • aprendizaje por descubrimiento, constructivismo<br>
+                • aprendizaje adaptativo, diferenciación<br>
+                • flipped classroom, aprendizaje activo<br>
+                • storytelling educativo, narrativa inmersiva
+              </div>
+            </div>
+          </div>
+          <input id="methodologies" placeholder="Ej. aprendizaje basado en proyectos, gamificación, flipped classroom" />
+        </label>
+
+        <label class="field full">
+          <span>Técnicas de prompt engineering (separadas por coma)</span>
+          <input id="promptTechniques" placeholder="Ej. few-shot, system prompt, step-by-step, persona, constraints" />
+        </label>
+
+        <label class="field full">
+          <span>Accesibilidad / Consideraciones (contraste, lectores, subtítulos)</span>
+          <input id="accessibility" placeholder="Ej. WCAG AA, subtítulos, navegación teclado" />
+        </label>
+
+        <label class="field full">
+          <div class="field-header">
+            <span>Restricciones técnicas</span>
+            <span class="help-icon" data-tooltip="tech-help">?</span>
+            <div class="tooltip" id="tech-help">
+              <div class="tooltip-title">⚙️ Consideraciones técnicas</div>
+              <div>Define límites técnicos para asegurar compatibilidad y simplicidad.</div>
+              <div class="tooltip-examples">
+                <strong>Sugerencias comunes:</strong><br>
+                • un solo archivo HTML (todo en uno)<br>
+                • sin backend, sin bases de datos<br>
+                • compatible con dispositivos móviles<br>
+                • funciona sin conexión a internet<br>
+                • guardado en localStorage<br>
+                • sin bibliotecas externas / solo vanilla JS
+              </div>
+            </div>
+          </div>
+          <input id="techConstraints" placeholder="Ej. sin backend, sin bibliotecas externas, compatible móvil" />
+        </label>
+
+        <label class="field full">
+          <div class="field-header">
+            <span>Instrucciones adicionales / Estética / Tonos</span>
+            <span class="help-icon" data-tooltip="extra-help">?</span>
+            <div class="tooltip" id="extra-help">
+              <div class="tooltip-title">🎨 Personalización adicional</div>
+              <div>Define el estilo visual, tono y características especiales del recurso.</div>
+              <div class="tooltip-examples">
+                <strong>Ideas de personalización:</strong><br>
+                • <strong>Visual:</strong> diseño minimalista, colores vibrantes, dark mode<br>
+                • <strong>Tono:</strong> amigable, motivador, profesional, divertido<br>
+                • <strong>Extra:</strong> animaciones suaves, sonidos de feedback, confeti al ganar<br>
+                • <strong>UX:</strong> progreso visible, hints opcionales, modo tutorial
+              </div>
+            </div>
+          </div>
+          <input id="extras" placeholder="Ej. visuales coloridos, estilo minimalista, tono motivador" />
+        </label>
+      </div>
+
+      <div class="examples-block">
+        <h3>Ejemplos (few-shot)</h3>
+        <div id="examples"></div>
+        <div class="examples-actions">
+          <button id="addExample" class="btn ghost">Añadir ejemplo</button>
+          <button id="clearExamples" class="btn ghost">Borrar ejemplos</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="generate" class="btn primary">Generar Megaprompt</button>
+        <button id="generateSample" class="btn">Generar Ejemplo Rápido</button>
+      </div>
+    </section>
+
+    <section class="card output-card" aria-live="polite">
+      <h2>Megaprompt generado</h2>
+      <div id="promptContainer" class="prompt-container">
+        <pre id="megaprompt" class="megaprompt" tabindex="0" aria-label="Megaprompt generado"></pre>
+      </div>
+
+      <div class="output-actions">
+        <button id="copyBtn" class="btn">Copiar al portapapeles</button>
+        <button id="downloadTxt" class="btn">Descargar .txt</button>
+        <button id="exportPdf" class="btn primary">Exportar a PDF</button>
+      </div>
+
+      <details class="help">
+        <summary>¿Qué contiene el megaprompt?</summary>
+        <p>El megaprompt incluye: instrucciones de sistema y rol, objetivos, pasos de la actividad, restricciones, criterios de evaluación, formato de entrega (HTML/CSS/JS o JSON), y ejemplos few-shot para guiar al modelo.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>Diseñado para generación de prompts pedagógicos — Puedes personalizar las plantillas en app.js</small>
+  </footer>
+
+</body>
+</html>
