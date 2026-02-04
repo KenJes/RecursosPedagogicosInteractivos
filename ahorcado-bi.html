@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorcado BI - Fundamentos de Business Intelligence</title>
+    <style>
+        /* ===========================
+           VARIABLES Y RESET
+        =========================== */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-light: #334155;
+            --text-light: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* ===========================
+           CONTENEDOR PRINCIPAL
+        =========================== */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* ===========================
+           HEADER
+        =========================== */
+        .header {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95em;
+        }
+
+        /* ===========================
+           ESTADÍSTICAS
+        =========================== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-value.score { color: var(--warning); }
+        .stat-value.lives { color: var(--danger); }
+        .stat-value.level { color: var(--success); }
+        .stat-value.streak { color: var(--secondary); }
+
+        /* ===========================
+           ÁREA DE JUEGO
+        =========================== */
+        .game-area {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .hangman-drawing {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            min-height: 250px;
+        }
+
+        .hangman-svg {
+            width: 250px;
+            height: 250px;
+        }
+
+        .question-area {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .question-label {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: var(--primary);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* ===========================
+           PALABRA A ADIVINAR
+        =========================== */
+        .word-display {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .letter-box {
+            width: 45px;
+            height: 55px;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .letter-box.revealed {
+            background: var(--primary);
+            border-color: var(--primary);
+            animation: revealLetter 0.5s ease;
+        }
+
+        .letter-box.space {
+            background: transparent;
+            border: none;
+            width: 20px;
+        }
+
+        @keyframes revealLetter {
+            0% { transform: scale(0) rotateY(180deg); }
+            50% { transform: scale(1.2) rotateY(90deg); }
+            100% { transform: scale(1) rotateY(0deg); }
+        }
+
+        /* ===========================
+           TECLADO VIRTUAL
+        =========================== */
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 8px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .key {
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            padding: 15px 10px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-light);
+        }
+
+        .key:hover:not(.disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .key:active:not(.disabled) {
+            transform: translateY(0);
+        }
+
+        .key.disabled {
+            background: var(--bg-dark);
+            border-color: var(--bg-dark);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .key.correct {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .key.incorrect {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* ===========================
+           FEEDBACK Y PISTAS
+        =========================== */
+        .feedback-box {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .feedback-box.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .feedback-box.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .socratic-hint {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-style: italic;
+            border-left: 3px solid var(--secondary);
+        }
+
+        /* ===========================
+           BOTONES
+        =========================== */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        /* ===========================
+           MODAL
+        =========================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===========================
+           INFORME/REPORTE
+        =========================== */
+        .report-container {
+            background: white;
+            color: #1e293b;
+            padding: 40px;
+            border-radius: 10px;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 20px;
+        }
+
+        .report-header h2 {
+            color: var(--primary);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .report-section {
+            margin-bottom: 30px;
+        }
+
+        .report-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-left: 4px solid var(--secondary);
+            padding-left: 15px;
+        }
+
+        .report-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .report-stat {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .report-stat-label {
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .report-stat-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .report-questions {
+            margin-top: 20px;
+        }
+
+        .report-question-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #cbd5e1;
+        }
+
+        .report-question-item.correct {
+            border-left-color: var(--success);
+        }
+
+        .report-question-item.incorrect {
+            border-left-color: var(--danger);
+        }
+
+        .report-recommendations {
+            background: #fef3c7;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .report-recommendations h4 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .report-recommendations ul {
+            margin-left: 20px;
+            color: #78350f;
+        }
+
+        /* ===========================
+           ANIMACIONES
+        =========================== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* ===========================
+           RESPONSIVE
+        =========================== */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .game-area {
+                padding: 20px 15px;
+            }
+
+            .keyboard {
+                gap: 5px;
+            }
+
+            .key {
+                padding: 12px 8px;
+                font-size: 0.95em;
+            }
+
+            .letter-box {
+                width: 35px;
+                height: 45px;
+                font-size: 1.4em;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .report-container {
+                padding: 25px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container > *:not(.modal) {
+                display: none !important;
+            }
+
+            .modal {
+                display: block !important;
+                position: static;
+                background: white;
+            }
+
+            .modal-content {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .button-group {
+                display: none !important;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎮 Ahorcado BI - Business Intelligence</h1>
+            <p>Demuestra tus conocimientos en fundamentos de BI mientras juegas</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Puntuación</div>
+                <div class="stat-value score" id="score">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">❤️ Vidas</div>
+                <div class="stat-value lives" id="lives">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Nivel</div>
+                <div class="stat-value level" id="level">1</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">🔥 Racha</div>
+                <div class="stat-value streak" id="streak">0</div>
+            </div>
+        </div>
+
+        <!-- Área de juego -->
+        <div class="game-area">
+            <!-- Dibujo del ahorcado -->
+            <div class="hangman-drawing">
+                <svg class="hangman-svg" viewBox="0 0 200 200" id="hangman">
+                    <!-- Base -->
+                    <line x1="20" y1="180" x2="120" y2="180" stroke="var(--text-muted)" stroke-width="4"/>
+                    <!-- Poste vertical -->
+                    <line x1="40" y1="180" x2="40" y2="20" stroke="var(--text-muted)" stroke-width="4"/>
+                    <!-- Poste horizontal -->
+                    <line x1="40" y1="20" x2="120" y2="20" stroke="var(--text-muted)" stroke-width="4"/>
+                    <!-- Cuerda -->
+                    <line x1="120" y1="20" x2="120" y2="40" stroke="var(--text-muted)" stroke-width="3"/>
+                    
+                    <!-- Partes del cuerpo (ocultas inicialmente) -->
+                    <!-- Cabeza -->
+                    <circle class="body-part" cx="120" cy="55" r="15" fill="none" stroke="var(--danger)" stroke-width="3" style="display: none;"/>
+                    <!-- Cuerpo -->
+                    <line class="body-part" x1="120" y1="70" x2="120" y2="120" stroke="var(--danger)" stroke-width="3" style="display: none;"/>
+                    <!-- Brazo izquierdo -->
+                    <line class="body-part" x1="120" y1="85" x2="95" y2="95" stroke="var(--danger)" stroke-width="3" style="display: none;"/>
+                    <!-- Brazo derecho -->
+                    <line class="body-part" x1="120" y1="85" x2="145" y2="95" stroke="var(--danger)" stroke-width="3" style="display: none;"/>
+                    <!-- Pierna izquierda -->
+                    <line class="body-part" x1="120" y1="120" x2="100" y2="150" stroke="var(--danger)" stroke-width="3" style="display: none;"/>
+                    <!-- Pierna derecha -->
+                    <line class="body-part" x1="120" y1="120" x2="140" y2="150" stroke="var(--danger)" stroke-width="3" style="display: none;"/>
+                </svg>
+            </div>
+
+            <!-- Pregunta -->
+            <div class="question-area">
+                <div class="question-label">Pregunta</div>
+                <div class="question-text" id="question">Cargando pregunta...</div>
+                <span class="category-badge" id="category">General</span>
+            </div>
+
+            <!-- Palabra a adivinar -->
+            <div class="word-display" id="word-display">
+                <!-- Las letras se generarán dinámicamente -->
+            </div>
+
+            <!-- Teclado virtual -->
+            <div class="keyboard" id="keyboard">
+                <!-- Las teclas se generarán dinámicamente -->
+            </div>
+
+            <!-- Feedback -->
+            <div class="feedback-box" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Retroalimentación</div>
+                <div id="feedback-text"></div>
+                <div class="socratic-hint" id="socratic-hint" style="display: none;"></div>
+            </div>
+
+            <!-- Botones de control -->
+            <div class="button-group">
+                <button class="btn btn-primary" id="hint-btn">💡 Pista</button>
+                <button class="btn btn-secondary" id="skip-btn">⏭️ Saltar</button>
+                <button class="btn btn-success" id="report-btn">📊 Ver Informe</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de fin de juego -->
+    <div class="modal" id="end-modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="end-title">🎉 ¡Juego Terminado!</h2>
+            <div id="end-message"></div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="gameController.resetGame()">🔄 Jugar de nuevo</button>
+                <button class="btn btn-success" onclick="gameController.showReport()">📊 Ver Informe Completo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de informe -->
+    <div class="modal" id="report-modal">
+        <div class="modal-content">
+            <div class="report-container" id="report-content">
+                <!-- El informe se generará dinámicamente -->
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+                <button class="btn btn-success" onclick="gameController.downloadPDF()">📄 Descargar PDF</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('report-modal').classList.remove('show')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script HTML2PDF desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        /* ===================================================
+           BANCO DE PREGUNTAS DE BUSINESS INTELLIGENCE
+        =================================================== */
+        const questionBank = [
+            {
+                question: "¿Qué es el proceso de transformar datos en conocimiento accionable?",
+                answer: "BUSINESS INTELLIGENCE",
+                category: "Conceptos Básicos",
+                hint: "Es el proceso completo que da nombre a nuestra disciplina.",
+                socraticHints: [
+                    "¿Qué sistema permite a las organizaciones tomar decisiones basadas en datos?",
+                    "¿Cuál es el objetivo final de analizar datos empresariales?",
+                    "¿Qué término engloba herramientas como dashboards, reportes y analítica?"
+                ]
+            },
+            {
+                question: "Sistema de almacenamiento centralizado de datos históricos de una organización",
+                answer: "DATA WAREHOUSE",
+                category: "Arquitectura BI",
+                hint: "Es un almacén específico para datos empresariales.",
+                socraticHints: [
+                    "¿Dónde se almacenan grandes volúmenes de datos históricos para análisis?",
+                    "¿Qué estructura permite consultas analíticas complejas?",
+                    "¿Cómo se llama el repositorio centralizado de datos empresariales?"
+                ]
+            },
+            {
+                question: "Proceso de extraer, transformar y cargar datos",
+                answer: "ETL",
+                category: "Procesos BI",
+                hint: "Son las siglas en inglés de un proceso de tres pasos.",
+                socraticHints: [
+                    "¿Qué proceso mueve datos desde fuentes operacionales a un almacén analítico?",
+                    "¿Cuáles son los tres pasos para preparar datos para análisis?",
+                    "¿Qué acrónimo describe: extraer, transformar, cargar?"
+                ]
+            },
+            {
+                question: "Indicador clave de rendimiento medible",
+                answer: "KPI",
+                category: "Métricas y Análisis",
+                hint: "Siglas en inglés para métricas críticas del negocio.",
+                socraticHints: [
+                    "¿Qué métrica mide el éxito de objetivos empresariales?",
+                    "¿Cómo se llaman los indicadores que miden rendimiento crítico?",
+                    "¿Qué herramienta cuantifica el progreso hacia metas estratégicas?"
+                ]
+            },
+            {
+                question: "Representación visual de datos en forma de gráficos y tablas",
+                answer: "DASHBOARD",
+                category: "Visualización",
+                hint: "Interfaz visual que muestra métricas en tiempo real.",
+                socraticHints: [
+                    "¿Qué herramienta muestra múltiples visualizaciones en una sola pantalla?",
+                    "¿Cómo se llama el panel de control de indicadores empresariales?",
+                    "¿Qué interfaz presenta KPIs de manera visual e interactiva?"
+                ]
+            },
+            {
+                question: "Modelo de datos multidimensional para análisis OLAP",
+                answer: "CUBO",
+                category: "Arquitectura BI",
+                hint: "Estructura tridimensional para análisis multidimensional.",
+                socraticHints: [
+                    "¿Qué estructura permite analizar datos desde múltiples perspectivas?",
+                    "¿Cómo se llama el modelo con dimensiones, medidas y jerarquías?",
+                    "¿Qué figura geométrica representa datos multidimensionales en BI?"
+                ]
+            },
+            {
+                question: "Técnica de análisis que examina información de un nivel general a detalles específicos",
+                answer: "DRILL DOWN",
+                category: "Análisis de Datos",
+                hint: "Acción de profundizar en los datos.",
+                socraticHints: [
+                    "¿Qué técnica permite ver datos con mayor granularidad?",
+                    "¿Cómo se llama navegar de lo general a lo específico en datos?",
+                    "¿Qué método permite explorar niveles más detallados de información?"
+                ]
+            },
+            {
+                question: "Subconjunto especializado de un data warehouse enfocado en un área específica",
+                answer: "DATA MART",
+                category: "Arquitectura BI",
+                hint: "Es como un mini almacén de datos departamental.",
+                socraticHints: [
+                    "¿Cómo se llama un almacén de datos para un departamento específico?",
+                    "¿Qué estructura contiene datos de un área funcional particular?",
+                    "¿Cuál es la versión reducida y especializada de un data warehouse?"
+                ]
+            },
+            {
+                question: "Proceso de analizar grandes volúmenes de datos para descubrir patrones",
+                answer: "DATA MINING",
+                category: "Análisis Avanzado",
+                hint: "Se utiliza para 'minar' o descubrir conocimiento oculto.",
+                socraticHints: [
+                    "¿Qué técnica descubre patrones ocultos en grandes conjuntos de datos?",
+                    "¿Cómo se llama la minería de conocimiento en bases de datos?",
+                    "¿Qué proceso usa algoritmos para encontrar correlaciones no evidentes?"
+                ]
+            },
+            {
+                question: "Análisis de datos que predice eventos futuros basándose en datos históricos",
+                answer: "PREDICTIVO",
+                category: "Tipos de Análisis",
+                hint: "Este tipo de análisis mira hacia el futuro.",
+                socraticHints: [
+                    "¿Qué tipo de análisis anticipa tendencias futuras?",
+                    "¿Cómo se llama el análisis que usa estadísticas para pronosticar?",
+                    "¿Qué análisis responde a la pregunta: qué pasará?"
+                ]
+            },
+            {
+                question: "Análisis que explica por qué ocurrió algo en los datos",
+                answer: "DIAGNOSTICO",
+                category: "Tipos de Análisis",
+                hint: "Similar a un diagnóstico médico, identifica causas.",
+                socraticHints: [
+                    "¿Qué análisis identifica las causas raíz de un evento?",
+                    "¿Cómo se llama el análisis que responde 'por qué pasó'?",
+                    "¿Qué tipo de análisis busca correlaciones causales?"
+                ]
+            },
+            {
+                question: "Análisis que describe qué ha sucedido en los datos",
+                answer: "DESCRIPTIVO",
+                category: "Tipos de Análisis",
+                hint: "El nivel más básico de análisis, resume el pasado.",
+                socraticHints: [
+                    "¿Qué análisis resume y describe datos históricos?",
+                    "¿Cómo se llama el análisis que responde 'qué pasó'?",
+                    "¿Qué tipo de análisis usa estadísticas básicas y visualizaciones?"
+                ]
+            },
+            {
+                question: "Conjunto de prácticas para garantizar la calidad y seguridad de los datos",
+                answer: "GOBIERNO DE DATOS",
+                category: "Gestión de Datos",
+                hint: "Marco de control y políticas sobre los datos.",
+                socraticHints: [
+                    "¿Qué framework asegura calidad, seguridad y cumplimiento de datos?",
+                    "¿Cómo se llama la gestión estratégica de activos de datos?",
+                    "¿Qué práctica define roles, políticas y procesos para datos?"
+                ]
+            },
+            {
+                question: "Herramienta que permite explorar datos visualmente sin conocimientos técnicos",
+                answer: "SELF SERVICE BI",
+                category: "Herramientas BI",
+                hint: "BI de autoservicio para usuarios de negocio.",
+                socraticHints: [
+                    "¿Qué tipo de BI permite a usuarios crear sus propios reportes?",
+                    "¿Cómo se llama el BI que no requiere ayuda del área técnica?",
+                    "¿Qué herramienta democratiza el acceso al análisis de datos?"
+                ]
+            },
+            {
+                question: "Medida numérica que representa el desempeño del negocio",
+                answer: "METRICA",
+                category: "Métricas y Análisis",
+                hint: "Valor cuantificable que se puede medir.",
+                socraticHints: [
+                    "¿Cómo se llama un valor medible del desempeño?",
+                    "¿Qué dato cuantitativo evalúa aspectos del negocio?",
+                    "¿Cuál es el término genérico para indicadores medibles?"
+                ]
+            }
+        ];
+
+        /* ===================================================
+           CONTROLADOR DEL JUEGO
+        =================================================== */
+        class GameController {
+            constructor() {
+                this.currentQuestion = null;
+                this.guessedLetters = new Set();
+                this.wrongGuesses = 0;
+                this.maxWrong = 6;
+                this.score = 0;
+                this.level = 1;
+                this.streak = 0;
+                this.questionHistory = [];
+                this.usedQuestions = new Set();
+                this.hintsUsed = 0;
+                this.skipsUsed = 0;
+                this.startTime = null;
+                
+                this.initialize();
+            }
+
+            /**
+             * Inicializa el juego
+             */
+            initialize() {
+                this.startTime = new Date();
+                this.createKeyboard();
+                this.loadNewQuestion();
+                this.setupEventListeners();
+                this.updateStats();
+            }
+
+            /**
+             * Crea el teclado virtual
+             */
+            createKeyboard() {
+                const keyboard = document.getElementById('keyboard');
+                const letters = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
+                
+                letters.forEach(letter => {
+                    const key = document.createElement('button');
+                    key.className = 'key';
+                    key.textContent = letter;
+                    key.setAttribute('data-letter', letter);
+                    key.addEventListener('click', () => this.handleGuess(letter));
+                    keyboard.appendChild(key);
+                });
+
+                // Soporte para teclado físico
+                document.addEventListener('keydown', (e) => {
+                    const letter = e.key.toUpperCase();
+                    if (letters.includes(letter) && !this.guessedLetters.has(letter)) {
+                        this.handleGuess(letter);
+                    }
+                });
+            }
+
+            /**
+             * Configura event listeners
+             */
+            setupEventListeners() {
+                document.getElementById('hint-btn').addEventListener('click', () => this.showHint());
+                document.getElementById('skip-btn').addEventListener('click', () => this.skipQuestion());
+                document.getElementById('report-btn').addEventListener('click', () => this.showReport());
+            }
+
+            /**
+             * Carga una nueva pregunta
+             */
+            loadNewQuestion() {
+                // Filtrar preguntas no usadas
+                const availableQuestions = questionBank.filter(q => !this.usedQuestions.has(q.answer));
+                
+                if (availableQuestions.length === 0) {
+                    this.endGame('¡Completaste todas las preguntas!');
+                    return;
+                }
+
+                // Seleccionar pregunta aleatoria
+                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                this.currentQuestion = availableQuestions[randomIndex];
+                this.usedQuestions.add(this.currentQuestion.answer);
+
+                // Resetear estado
+                this.guessedLetters.clear();
+                this.wrongGuesses = 0;
+                
+                // Actualizar UI
+                document.getElementById('question').textContent = this.currentQuestion.question;
+                document.getElementById('category').textContent = this.currentQuestion.category;
+                this.renderWord();
+                this.resetKeyboard();
+                this.updateHangman();
+                this.hideFeedback();
+            }
+
+            /**
+             * Renderiza la palabra a adivinar
+             */
+            renderWord() {
+                const wordDisplay = document.getElementById('word-display');
+                wordDisplay.innerHTML = '';
+
+                const answer = this.currentQuestion.answer;
+                
+                for (let char of answer) {
+                    const letterBox = document.createElement('div');
+                    
+                    if (char === ' ') {
+                        letterBox.className = 'letter-box space';
+                    } else {
+                        letterBox.className = 'letter-box';
+                        if (this.guessedLetters.has(char)) {
+                            letterBox.textContent = char;
+                            letterBox.classList.add('revealed');
+                        } else {
+                            letterBox.textContent = '';
+                        }
+                    }
+                    
+                    wordDisplay.appendChild(letterBox);
+                }
+            }
+
+            /**
+             * Maneja un intento de letra
+             */
+            handleGuess(letter) {
+                if (this.guessedLetters.has(letter)) return;
+
+                this.guessedLetters.add(letter);
+                
+                const key = document.querySelector(`[data-letter="${letter}"]`);
+                key.classList.add('disabled');
+
+                const answer = this.currentQuestion.answer;
+                
+                if (answer.includes(letter)) {
+                    // Acierto
+                    key.classList.add('correct');
+                    this.score += 10 * this.level;
+                    this.renderWord();
+                    
+                    if (this.isWordComplete()) {
+                        this.wordComplete();
+                    }
+                } else {
+                    // Error
+                    key.classList.add('incorrect');
+                    this.wrongGuesses++;
+                    this.updateHangman();
+                    this.showSocraticHint();
+                    
+                    if (this.wrongGuesses >= this.maxWrong) {
+                        this.wordFailed();
+                    }
+                }
+
+                this.updateStats();
+            }
+
+            /**
+             * Verifica si la palabra está completa
+             */
+            isWordComplete() {
+                const answer = this.currentQuestion.answer;
+                return answer.split('').every(char => 
+                    char === ' ' || this.guessedLetters.has(char)
+                );
+            }
+
+            /**
+             * Maneja palabra completada
+             */
+            wordComplete() {
+                this.streak++;
+                const bonus = this.streak * 50;
+                this.score += bonus;
+                
+                this.questionHistory.push({
+                    question: this.currentQuestion.question,
+                    answer: this.currentQuestion.answer,
+                    category: this.currentQuestion.category,
+                    correct: true,
+                    attempts: this.wrongGuesses,
+                    hintsUsed: this.hintsUsed
+                });
+
+                this.showFeedback(
+                    '¡Correcto! 🎉',
+                    `Excelente trabajo. Has ganado ${bonus} puntos de bonificación por tu racha de ${this.streak}.`,
+                    'success'
+                );
+
+                if (this.questionHistory.length % 3 === 0) {
+                    this.level++;
+                }
+
+                setTimeout(() => this.loadNewQuestion(), 3000);
+            }
+
+            /**
+             * Maneja palabra fallida
+             */
+            wordFailed() {
+                this.streak = 0;
+                
+                this.questionHistory.push({
+                    question: this.currentQuestion.question,
+                    answer: this.currentQuestion.answer,
+                    category: this.currentQuestion.category,
+                    correct: false,
+                    attempts: this.wrongGuesses,
+                    hintsUsed: this.hintsUsed
+                });
+
+                // Revelar respuesta
+                this.currentQuestion.answer.split('').forEach(char => {
+                    if (char !== ' ') {
+                        this.guessedLetters.add(char);
+                    }
+                });
+                this.renderWord();
+
+                this.showFeedback(
+                    '¡Se acabaron las vidas! 💔',
+                    `La respuesta era: <strong>${this.currentQuestion.answer}</strong>`,
+                    'error'
+                );
+
+                setTimeout(() => {
+                    if (this.questionHistory.length >= 5) {
+                        this.endGame('Has completado el cuestionario');
+                    } else {
+                        this.loadNewQuestion();
+                    }
+                }, 4000);
+            }
+
+            /**
+             * Muestra pista socrática
+             */
+            showSocraticHint() {
+                const hintIndex = Math.min(this.wrongGuesses - 1, this.currentQuestion.socraticHints.length - 1);
+                if (hintIndex >= 0) {
+                    const hint = this.currentQuestion.socraticHints[hintIndex];
+                    const hintBox = document.getElementById('socratic-hint');
+                    hintBox.textContent = `💭 Reflexiona: ${hint}`;
+                    hintBox.style.display = 'block';
+                }
+            }
+
+            /**
+             * Muestra pista regular
+             */
+            showHint() {
+                if (this.hintsUsed >= 2) {
+                    alert('Ya usaste todas tus pistas para esta pregunta');
+                    return;
+                }
+
+                this.hintsUsed++;
+                this.score = Math.max(0, this.score - 20);
+
+                this.showFeedback(
+                    '💡 Pista',
+                    this.currentQuestion.hint,
+                    'success'
+                );
+
+                this.updateStats();
+            }
+
+            /**
+             * Salta la pregunta
+             */
+            skipQuestion() {
+                if (!confirm('¿Seguro que quieres saltar esta pregunta? Perderás 50 puntos.')) {
+                    return;
+                }
+
+                this.skipsUsed++;
+                this.score = Math.max(0, this.score - 50);
+                this.streak = 0;
+
+                this.questionHistory.push({
+                    question: this.currentQuestion.question,
+                    answer: this.currentQuestion.answer,
+                    category: this.currentQuestion.category,
+                    correct: false,
+                    skipped: true
+                });
+
+                this.loadNewQuestion();
+            }
+
+            /**
+             * Actualiza el dibujo del ahorcado
+             */
+            updateHangman() {
+                const bodyParts = document.querySelectorAll('.body-part');
+                bodyParts.forEach((part, index) => {
+                    if (index < this.wrongGuesses) {
+                        part.style.display = 'block';
+                    }
+                });
+
+                const lives = this.maxWrong - this.wrongGuesses;
+                document.getElementById('lives').textContent = lives;
+            }
+
+            /**
+             * Resetea el teclado
+             */
+            resetKeyboard() {
+                document.querySelectorAll('.key').forEach(key => {
+                    key.classList.remove('disabled', 'correct', 'incorrect');
+                });
+                this.hintsUsed = 0;
+            }
+
+            /**
+             * Actualiza estadísticas
+             */
+            updateStats() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('streak').textContent = this.streak;
+            }
+
+            /**
+             * Muestra feedback
+             */
+            showFeedback(title, text, type) {
+                const feedbackBox = document.getElementById('feedback-box');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const feedbackText = document.getElementById('feedback-text');
+
+                feedbackTitle.textContent = title;
+                feedbackText.innerHTML = text;
+                feedbackBox.className = `feedback-box show ${type}`;
+            }
+
+            /**
+             * Oculta feedback
+             */
+            hideFeedback() {
+                document.getElementById('feedback-box').classList.remove('show');
+                document.getElementById('socratic-hint').style.display = 'none';
+            }
+
+            /**
+             * Termina el juego
+             */
+            endGame(message) {
+                const modal = document.getElementById('end-modal');
+                const endMessage = document.getElementById('end-message');
+
+                const correctAnswers = this.questionHistory.filter(q => q.correct).length;
+                const totalQuestions = this.questionHistory.length;
+                const accuracy = totalQuestions > 0 ? ((correctAnswers / totalQuestions) * 100).toFixed(1) : 0;
+
+                endMessage.innerHTML = `
+                    <p style="text-align: center; margin-bottom: 20px; font-size: 1.2em;">${message}</p>
+                    <div style="background: var(--bg-light); padding: 20px; border-radius: 10px;">
+                        <h3 style="margin-bottom: 15px; text-align: center;">Resumen Final</h3>
+                        <p><strong>Puntuación Total:</strong> ${this.score} puntos</p>
+                        <p><strong>Nivel Alcanzado:</strong> ${this.level}</p>
+                        <p><strong>Preguntas Correctas:</strong> ${correctAnswers} / ${totalQuestions}</p>
+                        <p><strong>Precisión:</strong> ${accuracy}%</p>
+                        <p><strong>Racha Máxima:</strong> ${Math.max(...this.questionHistory.map((_, i) => {
+                            let streak = 0;
+                            for (let j = i; j < this.questionHistory.length && this.questionHistory[j].correct; j++) {
+                                streak++;
+                            }
+                            return streak;
+                        }), 0)}</p>
+                    </div>
+                `;
+
+                modal.classList.add('show');
+            }
+
+            /**
+             * Genera y muestra el informe
+             */
+            showReport() {
+                const reportContent = document.getElementById('report-content');
+                const correctAnswers = this.questionHistory.filter(q => q.correct).length;
+                const totalQuestions = this.questionHistory.length;
+                const accuracy = totalQuestions > 0 ? ((correctAnswers / totalQuestions) * 100).toFixed(1) : 0;
+                const endTime = new Date();
+                const duration = Math.round((endTime - this.startTime) / 60000);
+
+                // Generar recomendaciones basadas en el desempeño
+                const recommendations = this.generateRecommendations();
+
+                reportContent.innerHTML = `
+                    <div class="report-header">
+                        <h2>📊 Informe de Aprendizaje - Business Intelligence</h2>
+                        <p style="color: #64748b;">Fecha: ${endTime.toLocaleDateString('es-ES', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}</p>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>📈 Estadísticas Generales</h3>
+                        <div class="report-stats">
+                            <div class="report-stat">
+                                <div class="report-stat-label">Puntuación</div>
+                                <div class="report-stat-value">${this.score}</div>
+                            </div>
+                            <div class="report-stat">
+                                <div class="report-stat-label">Nivel</div>
+                                <div class="report-stat-value">${this.level}</div>
+                            </div>
+                            <div class="report-stat">
+                                <div class="report-stat-label">Precisión</div>
+                                <div class="report-stat-value">${accuracy}%</div>
+                            </div>
+                            <div class="report-stat">
+                                <div class="report-stat-label">Duración</div>
+                                <div class="report-stat-value">${duration} min</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>📝 Resumen de Desempeño</h3>
+                        <p><strong>Preguntas Respondidas:</strong> ${totalQuestions}</p>
+                        <p><strong>Respuestas Correctas:</strong> ${correctAnswers}</p>
+                        <p><strong>Respuestas Incorrectas:</strong> ${totalQuestions - correctAnswers}</p>
+                        <p><strong>Pistas Utilizadas:</strong> ${this.questionHistory.reduce((sum, q) => sum + (q.hintsUsed || 0), 0)}</p>
+                        <p><strong>Preguntas Saltadas:</strong> ${this.skipsUsed}</p>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>🎯 Detalle de Preguntas</h3>
+                        <div class="report-questions">
+                            ${this.questionHistory.map((item, index) => `
+                                <div class="report-question-item ${item.correct ? 'correct' : 'incorrect'}">
+                                    <strong>Pregunta ${index + 1}:</strong> ${item.question}<br>
+                                    <strong>Categoría:</strong> ${item.category}<br>
+                                    <strong>Respuesta:</strong> ${item.answer}<br>
+                                    <strong>Estado:</strong> ${item.skipped ? '⏭️ Saltada' : (item.correct ? '✅ Correcta' : '❌ Incorrecta')}<br>
+                                    ${item.attempts !== undefined ? `<strong>Intentos fallidos:</strong> ${item.attempts}<br>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="report-section">
+                        <div class="report-recommendations">
+                            <h4>💡 Recomendaciones de Mejora</h4>
+                            <ul>
+                                ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="report-section">
+                        <h3>🎓 Análisis Pedagógico</h3>
+                        <p style="text-align: justify;">
+                            ${this.generatePedagogicalAnalysis()}
+                        </p>
+                    </div>
+                `;
+
+                document.getElementById('report-modal').classList.add('show');
+            }
+
+            /**
+             * Genera recomendaciones personalizadas
+             */
+            generateRecommendations() {
+                const recommendations = [];
+                const correctAnswers = this.questionHistory.filter(q => q.correct).length;
+                const totalQuestions = this.questionHistory.length;
+                const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+
+                if (accuracy < 50) {
+                    recommendations.push("Revisa los conceptos fundamentales de Business Intelligence. Considera repasar el material de clase.");
+                    recommendations.push("Practica con ejercicios adicionales sobre arquitectura de BI y procesos ETL.");
+                }
+
+                if (accuracy >= 50 && accuracy < 75) {
+                    recommendations.push("Buen progreso. Enfócate en las categorías donde tuviste más errores.");
+                    recommendations.push("Profundiza en los conceptos de análisis avanzado y tipos de análisis.");
+                }
+
+                if (accuracy >= 75) {
+                    recommendations.push("¡Excelente dominio de los fundamentos de BI!");
+                    recommendations.push("Considera explorar temas avanzados como Machine Learning aplicado a BI.");
+                }
+
+                // Análisis por categoría
+                const categoryPerformance = {};
+                this.questionHistory.forEach(q => {
+                    if (!categoryPerformance[q.category]) {
+                        categoryPerformance[q.category] = { correct: 0, total: 0 };
+                    }
+                    categoryPerformance[q.category].total++;
+                    if (q.correct) categoryPerformance[q.category].correct++;
+                });
+
+                Object.entries(categoryPerformance).forEach(([category, stats]) => {
+                    const catAccuracy = (stats.correct / stats.total) * 100;
+                    if (catAccuracy < 60) {
+                        recommendations.push(`Refuerza tus conocimientos en: ${category}`);
+                    }
+                });
+
+                return recommendations;
+            }
+
+            /**
+             * Genera análisis pedagógico
+             */
+            generatePedagogicalAnalysis() {
+                const correctAnswers = this.questionHistory.filter(q => q.correct).length;
+                const totalQuestions = this.questionHistory.length;
+                const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+
+                if (accuracy >= 80) {
+                    return `El estudiante demuestra un dominio sobresaliente de los fundamentos de Business Intelligence, 
+                    mostrando capacidad para identificar correctamente conceptos clave, procesos y herramientas. 
+                    Se evidencia comprensión profunda de la arquitectura BI, análisis de datos y visualización. 
+                    Se recomienda continuar con temas avanzados y casos prácticos de aplicación empresarial.`;
+                } else if (accuracy >= 60) {
+                    return `El estudiante muestra un nivel competente en los fundamentos de BI, con áreas de oportunidad 
+                    en conceptos específicos. Se sugiere reforzar el estudio mediante casos prácticos y ejercicios 
+                    adicionales en las categorías con menor desempeño. La comprensión general es adecuada pero requiere 
+                    consolidación de conocimientos para aplicación práctica.`;
+                } else {
+                    return `Se identifica la necesidad de reforzar significativamente los conceptos fundamentales de 
+                    Business Intelligence. Se recomienda revisar el material teórico, participar en sesiones de tutoría 
+                    y realizar ejercicios prácticos adicionales. Es importante consolidar la comprensión de conceptos 
+                    básicos antes de avanzar a temas más complejos. Se sugiere utilizar recursos complementarios y 
+                    estudiar ejemplos aplicados al contexto empresarial.`;
+                }
+            }
+
+            /**
+             * Descarga el informe como PDF
+             */
+            downloadPDF() {
+                const element = document.getElementById('report-content');
+                const opt = {
+                    margin: 10,
+                    filename: `Informe_BI_${new Date().getTime()}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().set(opt).from(element).save();
+            }
+
+            /**
+             * Reinicia el juego
+             */
+            resetGame() {
+                document.getElementById('end-modal').classList.remove('show');
+                document.getElementById('report-modal').classList.remove('show');
+                
+                this.currentQuestion = null;
+                this.guessedLetters.clear();
+                this.wrongGuesses = 0;
+                this.score = 0;
+                this.level = 1;
+                this.streak = 0;
+                this.questionHistory = [];
+                this.usedQuestions.clear();
+                this.hintsUsed = 0;
+                this.skipsUsed = 0;
+                this.startTime = new Date();
+
+                this.updateStats();
+                this.loadNewQuestion();
+            }
+        }
+
+        /* ===================================================
+           INICIALIZACIÓN
+        =================================================== */
+        let gameController;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            gameController = new GameController();
+        });
+    </script>
+</body>
+</html>
