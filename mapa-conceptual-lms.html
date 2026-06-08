@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecosistema LMS - Mapa Conceptual Interactivo</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome para Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* Colores - Modo Claro (Por defecto) */
+            --bg-global: #f4f6fa;
+            --bg-grid: rgba(0, 0, 0, 0.04);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --border-card: rgba(255, 255, 255, 0.5);
+            --text-title: #1e293b;
+            --text-body: #475569;
+            --text-muted: #64748b;
+            --sidebar-bg: rgba(255, 255, 255, 0.9);
+            --modal-bg: rgba(255, 255, 255, 0.95);
+            --shadow-primary: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+            --shadow-card: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+            
+            /* Colores de Ramas (Significados Conceptuales) */
+            --color-root-grad: linear-gradient(135deg, #1e3c72, #2a5298);
+            --color-root: #1e3c72;
+            --color-branch-fundamentos: #0284c7;
+            --color-branch-plataformas: #ea580c;
+            --color-branch-interoperabilidad: #059669;
+            --color-branch-retos: #dc2626;
+            --color-branch-futuro: #7c3aed;
+            
+            --connector-color: #94a3b8;
+            --connector-active: #3b82f6;
+            --connector-thickness: 2.5px;
+            
+            --glass-blur: blur(16px);
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            /* Colores - Modo Oscuro */
+            --bg-global: #0b0f19;
+            --bg-grid: rgba(255, 255, 255, 0.03);
+            --bg-card: rgba(17, 24, 39, 0.8);
+            --border-card: rgba(255, 255, 255, 0.07);
+            --text-title: #f1f5f9;
+            --text-body: #cbd5e1;
+            --text-muted: #94a3b8;
+            --sidebar-bg: rgba(17, 24, 39, 0.92);
+            --modal-bg: rgba(17, 24, 39, 0.96);
+            --shadow-primary: 0 10px 40px -15px rgba(0, 0, 0, 0.6);
+            --shadow-card: 0 4px 30px -10px rgba(0, 0, 0, 0.4);
+            
+            --color-root-grad: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            --color-root: #3b82f6;
+            --color-branch-fundamentos: #38bdf8;
+            --color-branch-plataformas: #fb923c;
+            --color-branch-interoperabilidad: #34d399;
+            --color-branch-retos: #f87171;
+            --color-branch-futuro: #a78bfa;
+            
+            --connector-color: #475569;
+            --connector-active: #60a5fa;
+        }
+
+        /* Estilos Generales */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-global);
+            color: var(--text-body);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            transition: background-color var(--transition-speed);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        /* Interfaz de Control (Header e Toolbar) */
+        .app-header {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 70px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            box-shadow: var(--shadow-primary);
+            z-index: 100;
+            transition: all var(--transition-speed);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: var(--color-root-grad);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.15rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .search-container {
+            position: relative;
+            width: 280px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 0 16px 0 40px;
+            color: var(--text-title);
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        [data-theme="dark"] .search-input {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--connector-active);
+            background: var(--bg-card);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.15);
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .controls-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-tool {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-title);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        [data-theme="dark"] .btn-tool {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .btn-tool:hover {
+            background: var(--connector-active);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-tool.active {
+            background: var(--connector-active);
+            color: white;
+        }
+
+        .btn-tool-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            width: auto;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Lienzo del Mapa (Canvas Area) */
+        .map-viewport {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background-image: 
+                radial-gradient(var(--bg-grid) 1.5px, transparent 1.5px), 
+                radial-gradient(var(--bg-grid) 1.5px, transparent 1.5px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+            cursor: grab;
+            overflow: hidden;
+        }
+
+        .map-viewport:active {
+            cursor: grabbing;
+        }
+
+        .map-canvas {
+            position: absolute;
+            transform-origin: 0 0;
+            width: 3200px;
+            height: 2000px;
+            top: 0;
+            left: 0;
+            transition: transform 0.05s ease-out;
+            padding: 150px 100px;
+        }
+
+        /* SVG para conectores */
+        .connectors-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connector-path {
+            fill: none;
+            stroke: var(--connector-color);
+            stroke-width: var(--connector-thickness);
+            stroke-linecap: round;
+            transition: stroke 0.3s, stroke-width 0.3s;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+        }
+
+        .connector-path.active {
+            stroke: var(--connector-active);
+            stroke-width: calc(var(--connector-thickness) + 1.5px);
+            filter: drop-shadow(0 0 6px var(--connector-active));
+        }
+
+        /* Estructura Jerárquica del Mapa (Columnas Flex) */
+        .nodes-layout {
+            display: flex;
+            position: relative;
+            z-index: 2;
+            gap: 160px;
+            align-items: center;
+            height: 100%;
+            width: fit-content;
+        }
+
+        .nodes-column {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .nodes-column.center-col {
+            gap: 40px;
+        }
+
+        /* Tarjetas de Nodo (Cards) */
+        .node-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 18px;
+            width: 260px;
+            padding: 20px;
+            box-shadow: var(--shadow-card);
+            backdrop-filter: var(--glass-blur);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .node-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="dark"] .node-card:hover {
+            box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.5);
+            border-color: var(--connector-active);
+        }
+
+        /* Nodos específicos e indicativos de Rama */
+        .node-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            border-radius: 18px 18px 0 0;
+        }
+
+        .node-card.root::before { background: var(--color-root-grad); }
+        .node-card.branch-fundamentos::before { background: var(--color-branch-fundamentos); }
+        .node-card.branch-plataformas::before { background: var(--color-branch-plataformas); }
+        .node-card.branch-interoperabilidad::before { background: var(--color-branch-interoperabilidad); }
+        .node-card.branch-retos::before { background: var(--color-branch-retos); }
+        .node-card.branch-futuro::before { background: var(--color-branch-futuro); }
+
+        /* Iconos de Nodo */
+        .node-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            margin-bottom: 14px;
+            transition: all 0.3s;
+        }
+
+        .node-card.root .node-icon-wrapper { background: rgba(59, 130, 246, 0.12); color: var(--color-root); }
+        .node-card.branch-fundamentos .node-icon-wrapper { background: rgba(2, 132, 199, 0.12); color: var(--color-branch-fundamentos); }
+        .node-card.branch-plataformas .node-icon-wrapper { background: rgba(234, 88, 12, 0.12); color: var(--color-branch-plataformas); }
+        .node-card.branch-interoperabilidad .node-icon-wrapper { background: rgba(5, 150, 105, 0.12); color: var(--color-branch-interoperabilidad); }
+        .node-card.branch-retos .node-icon-wrapper { background: rgba(220, 38, 38, 0.12); color: var(--color-branch-retos); }
+        .node-card.branch-futuro .node-icon-wrapper { background: rgba(124, 58, 237, 0.12); color: var(--color-branch-futuro); }
+
+        .node-title {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            line-height: 1.25;
+        }
+
+        .node-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .node-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-top: 1px dashed rgba(0, 0, 0, 0.08);
+            padding-top: 10px;
+        }
+
+        [data-theme="dark"] .node-meta {
+            border-top-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .node-link {
+            color: var(--connector-active);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Botón de Colapso en Nodos */
+        .node-collapse-btn {
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+            z-index: 10;
+            color: var(--text-title);
+            transition: all 0.2s;
+        }
+
+        .node-collapse-btn:hover {
+            background: var(--connector-active);
+            color: white;
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        /* Colapso en sentido izquierdo */
+        .node-collapse-btn.left-side {
+            left: -12px;
+            right: auto;
+        }
+
+        /* Estados de Búsqueda y Filtrado */
+        .node-card.dimmed {
+            opacity: 0.25;
+            filter: blur(1px);
+        }
+
+        .node-card.highlighted {
+            border-color: var(--connector-active);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Conectores ocultos por colapso */
+        .collapsed-branch {
+            display: none !important;
+        }
+
+        /* Panel de Detalles (Slide-in Sidebar) */
+        .details-sidebar {
+            position: fixed;
+            top: 20px;
+            right: -450px;
+            bottom: 20px;
+            width: 420px;
+            background: var(--sidebar-bg);
+            border-left: 1px solid var(--border-card);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 20px;
+            box-shadow: var(--shadow-primary);
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        .details-sidebar.open {
+            right: 20px;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .sidebar-title-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .sidebar-close:hover {
+            color: var(--text-title);
+        }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-card);
+            background: rgba(0,0,0,0.02);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 12px 6px;
+            border: none;
+            background: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .sidebar-tab:hover {
+            color: var(--text-title);
+        }
+
+        .sidebar-tab.active {
+            color: var(--connector-active);
+            border-bottom-color: var(--connector-active);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Estilo de Contenido de Detalle */
+        .detail-sintesis {
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        .detail-sintesis p {
+            margin-bottom: 16px;
+        }
+
+        .detail-sintesis ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .detail-sintesis li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .detail-sintesis li::before {
+            content: "•";
+            color: var(--connector-active);
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: absolute;
+            left: 0;
+            top: -2px;
+        }
+
+        .relation-card {
+            background: rgba(0, 0, 0, 0.02);
+            border-left: 3px solid var(--connector-active);
+            padding: 12px 16px;
+            border-radius: 4px 8px 8px 4px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        [data-theme="dark"] .relation-card {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .relation-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-title);
+        }
+
+        .concept-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--connector-active);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        /* Modals Modernos (Glassmorphism Overlay) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: var(--modal-bg);
+            border: 1px solid var(--border-card);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-primary);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.open .modal-container {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid var(--border-card);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--text-title);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Línea del Tiempo Interactiva (Timeline) */
+        .timeline-container {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 14px;
+            width: 3px;
+            background: var(--border-card);
+        }
+
+        .timeline-event {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-badge {
+            position: absolute;
+            left: -30px;
+            top: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--connector-active);
+            border: 3px solid var(--modal-bg);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            transition: all 0.3s;
+        }
+
+        .timeline-event:hover .timeline-badge {
+            transform: scale(1.3);
+            background: var(--color-branch-plataformas);
+        }
+
+        .timeline-year {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--connector-active);
+            margin-bottom: 6px;
+        }
+
+        .timeline-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .timeline-text {
+            font-size: 0.85rem;
+            color: var(--text-body);
+            line-height: 1.5;
+        }
+
+        /* Tabla Comparativa Interactiva (Comparison Matrix) */
+        .comparison-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-card);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-card);
+        }
+
+        .comparison-table th {
+            background: rgba(0, 0, 0, 0.03);
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        [data-theme="dark"] .comparison-table th {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 0, 0, 0.015);
+        }
+
+        .comparison-table td:first-child {
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        .platform-badge-col {
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-moodle { color: var(--color-branch-fundamentos); }
+        .badge-canvas { color: var(--color-branch-plataformas); }
+        .badge-blackboard { color: var(--color-branch-futuro); }
+
+        /* Quiz de Autoevaluación */
+        .quiz-intro {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .quiz-intro i {
+            font-size: 4rem;
+            color: var(--connector-active);
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .quiz-intro p {
+            margin-bottom: 24px;
+            color: var(--text-muted);
+        }
+
+        .btn-action {
+            padding: 12px 28px;
+            background: var(--color-root-grad);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .quiz-card {
+            display: none;
+        }
+
+        .quiz-card.active {
+            display: block;
+        }
+
+        .quiz-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .quiz-progress-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: var(--border-card);
+            border-radius: 3px;
+            margin: 0 16px;
+            overflow: hidden;
+        }
+
+        .quiz-progress-bar-fill {
+            height: 100%;
+            background: var(--connector-active);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-title);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .quiz-option {
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.02);
+            border: 2px solid var(--border-card);
+            border-radius: 12px;
+            text-align: left;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-body);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        [data-theme="dark"] .quiz-option {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .quiz-option:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: var(--connector-active);
+        }
+
+        .quiz-option.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: #10b981 !important;
+            color: #047857 !important;
+        }
+
+        [data-theme="dark"] .quiz-option.correct {
+            color: #34d399 !important;
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+        }
+
+        [data-theme="dark"] .quiz-option.incorrect {
+            color: #f87171 !important;
+        }
+
+        .quiz-feedback {
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .quiz-feedback.correct {
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid #10b981;
+            color: var(--text-body);
+        }
+
+        .quiz-feedback.incorrect {
+            background: rgba(239, 68, 68, 0.08);
+            border-left: 4px solid #ef4444;
+            color: var(--text-body);
+        }
+
+        .quiz-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Certificado/Constancia en HTML */
+        .certificate-box {
+            background: white;
+            border: 6px double #3b82f6;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+            color: #1e293b;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .certificate-box::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid rgba(59,130,246,0.3);
+            pointer-events: none;
+        }
+
+        .cert-header h2 {
+            font-family: 'Outfit', sans-serif;
+            color: #1e3c72;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .cert-header p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .cert-body {
+            margin: 30px 0;
+        }
+
+        .cert-body p {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .cert-name {
+            font-size: 1.8rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: #1e293b;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            display: inline-block;
+            padding: 0 30px 5px 30px;
+            margin: 15px 0;
+        }
+
+        .cert-detail {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #475569;
+            margin-bottom: 20px;
+        }
+
+        .cert-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 30px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            padding-top: 15px;
+        }
+
+        .cert-seal {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #f5af19, #f12711);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 10px rgba(241, 39, 17, 0.2);
+            margin: 0 auto 15px auto;
+        }
+
+        /* Animación Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Media Queries y Responsive */
+        @media (max-width: 768px) {
+            .app-header {
+                height: auto;
+                flex-direction: column;
+                padding: 16px;
+                gap: 12px;
+                top: 10px; left: 10px; right: 10px;
+            }
+            .search-container {
+                width: 100%;
+            }
+            .details-sidebar {
+                width: 100vw;
+                right: -100vw;
+                border-radius: 0;
+                top: 0; bottom: 0;
+            }
+            .details-sidebar.open {
+                right: 0;
+            }
+            .modal-container {
+                width: 95%;
+                max-height: 90vh;
+            }
+        }
+
+        /* Impresión del Certificado */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .certificate-box, .certificate-box * {
+                visibility: visible;
+            }
+            .certificate-box {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: 10px double #1e3c72;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cabecera de Control -->
+    <header class="app-header">
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Ecosistema LMS</h1>
+                <span>Mapa Conceptual Didáctico • Kenneth A.</span>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar conceptos (ej. SCORM, IA, Moodle)...">
+        </div>
+
+        <div class="controls-toolbar">
+            <button class="btn-tool" id="btnZoomIn" title="Acercar (Zoom In)"><i class="fa-solid fa-plus"></i></button>
+            <button class="btn-tool" id="btnZoomOut" title="Alejar (Zoom Out)"><i class="fa-solid fa-minus"></i></button>
+            <button class="btn-tool" id="btnZoomReset" title="Restaurar Vista"><i class="fa-solid fa-expand"></i></button>
+            <button class="btn-tool" id="btnThemeToggle" title="Cambiar Tema"><i class="fa-solid fa-moon"></i></button>
+            
+            <div style="width: 1px; height: 24px; background: var(--border-card); margin: 0 8px;"></div>
+            
+            <button class="btn-tool btn-tool-text" id="btnOpenTimeline">
+                <i class="fa-solid fa-timeline"></i> Línea del Tiempo
+            </button>
+            <button class="btn-tool btn-tool-text" id="btnOpenComparativa">
+                <i class="fa-solid fa-table-list"></i> Comparar LMS
+            </button>
+            <button class="btn-tool btn-tool-text" id="btnOpenQuiz">
+                <i class="fa-solid fa-graduation-cap"></i> Evaluar Aprendizaje
+            </button>
+        </div>
+    </header>
+
+    <!-- Área del Canvas (Mapa Conceptual) -->
+    <main class="map-viewport" id="mapViewport">
+        <div class="map-canvas" id="mapCanvas">
+            <!-- Capa SVG para las Líneas Conectoras -->
+            <svg class="connectors-svg" id="connectorsSvg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--connector-color)"></path>
+                    </marker>
+                    <marker id="arrow-active" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--connector-active)"></path>
+                    </marker>
+                </defs>
+            </svg>
+
+            <!-- Jerarquía de Nodos Organizados en Columnas -->
+            <div class="nodes-layout">
+                
+                <!-- COLUMNA 1: Hijos de la izquierda (Conceptos Iniciales / Plataformas) -->
+                <div class="nodes-column" id="colLeftChildren">
+                    <!-- Rama 1: Fundamentos Hijos -->
+                    <div class="node-card branch-fundamentos" id="nodeConceptoLMS" data-concept="concepto">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-book-open"></i></div>
+                        <h3 class="node-title">Concepto de LMS</h3>
+                        <p class="node-desc">Sistemas que automatizan la gestión, distribución y evaluación formativa de cursos.</p>
+                        <div class="node-meta">
+                            <span>Fundamentos</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-fundamentos" id="nodeEvolucionLMS" data-concept="evolucion">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <h3 class="node-title">Evolución Histórica</h3>
+                        <p class="node-desc">Hitos desde las redes mainframe PLATO (1960) hasta plataformas Cloud Modernas (2011+).</p>
+                        <div class="node-meta">
+                            <span>Historia</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Rama 2: Plataformas Líderes Hijos -->
+                    <div class="node-card branch-plataformas" id="nodeMoodle" data-concept="moodle">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-m"></i></div>
+                        <h3 class="node-title">Moodle LMS</h3>
+                        <p class="node-desc">Basado en el constructivismo social, destaca por su alto nivel de personalización y software libre.</p>
+                        <div class="node-meta">
+                            <span>Open Source</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-plataformas" id="nodeCanvas" data-concept="canvas">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-compass"></i></div>
+                        <h3 class="node-title">Canvas LMS</h3>
+                        <p class="node-desc">Arquitectura SaaS nativa, APIs REST robustas y excelente experiencia de usuario moderna.</p>
+                        <div class="node-meta">
+                            <span>SaaS Comercial</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-plataformas" id="nodeBlackboard" data-concept="blackboard">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-chalkboard"></i></div>
+                        <h3 class="node-title">Blackboard Learn</h3>
+                        <p class="node-desc">Plataforma propietaria robusta de grado institucional con enfoque en evaluación integral.</p>
+                        <div class="node-meta">
+                            <span>Privativo</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA 2: Nodos de Categoría Izquierda (Categorías de Entrada) -->
+                <div class="nodes-column" id="colLeftCategories">
+                    <div class="node-card branch-fundamentos" id="nodeCatFundamentos" data-concept="cat-fundamentos">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <h3 class="node-title">Fundamentos e Historia</h3>
+                        <p class="node-desc">La definición esencial y la evolución temporal del software educativo.</p>
+                        <div class="node-collapse-btn left-side" id="btnCollapseFundamentos"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="node-meta">
+                            <span>Categoría</span>
+                            <span class="node-link">Abrir <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-plataformas" id="nodeCatPlataformas" data-concept="cat-plataformas">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-cubes"></i></div>
+                        <h3 class="node-title">Plataformas Líderes</h3>
+                        <p class="node-desc">Análisis comparativo de los tres grandes ecosistemas vigentes en el mercado.</p>
+                        <div class="node-collapse-btn left-side" id="btnCollapsePlataformas"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="node-meta">
+                            <span>Categoría</span>
+                            <span class="node-link">Abrir <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA 3: NODO CENTRAL (NIVEL 0) -->
+                <div class="nodes-column center-col" id="colRoot">
+                    <div class="node-card root" id="nodeRoot" data-concept="root-concept">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-network-wired"></i></div>
+                        <h3 class="node-title">Sistemas LMS</h3>
+                        <p class="node-desc">Núcleo central del ecosistema tecnopedagógico. Orquesta contenidos, datos e interacciones formativas.</p>
+                        <div class="node-meta">
+                            <span>LMS Principal</span>
+                            <span class="node-link">Ver Resumen <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA 4: Nodos de Categoría Derecha (Categorías de Salida) -->
+                <div class="nodes-column" id="colRightCategories">
+                    <div class="node-card branch-interoperabilidad" id="nodeCatInteroperabilidad" data-concept="cat-interop">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-shuffle"></i></div>
+                        <h3 class="node-title">Interoperabilidad</h3>
+                        <p class="node-desc">Estándares y protocolos técnicos que permiten compartir contenidos y herramientas.</p>
+                        <div class="node-collapse-btn" id="btnCollapseInterop"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="node-meta">
+                            <span>Categoría</span>
+                            <span class="node-link">Abrir <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-retos" id="nodeCatRetos" data-concept="cat-retos">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <h3 class="node-title">Retos del Ecosistema</h3>
+                        <p class="node-desc">Los desafíos críticos desde la perspectiva tecnológica e instruccional del aprendizaje.</p>
+                        <div class="node-collapse-btn" id="btnCollapseRetos"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="node-meta">
+                            <span>Categoría</span>
+                            <span class="node-link">Abrir <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-futuro" id="nodeCatFuturo" data-concept="cat-futuro">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-lightbulb"></i></div>
+                        <h3 class="node-title">Futuro e Innovación</h3>
+                        <p class="node-desc">Analítica masiva de datos, automatizaciones inteligentes y evolución descentralizada.</p>
+                        <div class="node-collapse-btn" id="btnCollapseFuturo"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="node-meta">
+                            <span>Categoría</span>
+                            <span class="node-link">Abrir <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA 5: Hijos de la Derecha (Detalles Técnicos y Futuro) -->
+                <div class="nodes-column" id="colRightChildren">
+                    <!-- Rama 3: Interoperabilidad e Integración Hijos -->
+                    <div class="node-card branch-interoperabilidad" id="nodeSCORM" data-concept="scorm">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-box-archive"></i></div>
+                        <h3 class="node-title">SCORM estándar</h3>
+                        <p class="node-desc">Formato heredado para empaquetar actividades autogestivas. Registra notas básicas dentro del navegador.</p>
+                        <div class="node-meta">
+                            <span>Empaquetado</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-interoperabilidad" id="nodeLTI" data-concept="lti">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-link"></i></div>
+                        <h3 class="node-title">LTI Integración</h3>
+                        <p class="node-desc">Protocolo seguro para incrustar aplicaciones externas (simuladores, videoconferencias) en el LMS.</p>
+                        <div class="node-meta">
+                            <span>Interconexión</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-interoperabilidad" id="nodeXAPI" data-concept="xapi">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-database"></i></div>
+                        <h3 class="node-title">xAPI (Tin Can)</h3>
+                        <p class="node-desc">Estándar moderno para registrar aprendizajes fuera del LMS mediante LRS y micro-enunciados.</p>
+                        <div class="node-meta">
+                            <span>Experiencias</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-interoperabilidad" id="nodeIntegracionExt" data-concept="integraciones">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-circle-nodes"></i></div>
+                        <h3 class="node-title">Herramientas Externas</h3>
+                        <p class="node-desc">Uso de APIs REST, webhooks avanzados y Single Sign-On (SSO) para portabilidad e identidad.</p>
+                        <div class="node-meta">
+                            <span>APIs & webhooks</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Rama 4: Retos del Ecosistema Hijos -->
+                    <div class="node-card branch-retos" id="nodeRetosTecnicos" data-concept="retos-tecnicos">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h3 class="node-title">Retos Técnicos</h3>
+                        <p class="node-desc">Seguridad de datos (GDPR), escalabilidad en picos de demanda y alta disponibilidad.</p>
+                        <div class="node-meta">
+                            <span>Desafío IT</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-retos" id="nodeRetosPedagogicos" data-concept="retos-pedagogicos">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-people-group"></i></div>
+                        <h3 class="node-title">Retos Pedagógicos</h3>
+                        <p class="node-desc">Diseño instruccional efectivo, fomento del aprendizaje activo y evaluación formativa real.</p>
+                        <div class="node-meta">
+                            <span>Desafío Didáctico</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Rama 5: Futuro Hijos -->
+                    <div class="node-card branch-futuro" id="nodeAnaliticaIA" data-concept="analitica-ia">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-brain"></i></div>
+                        <h3 class="node-title">Analítica e IA</h3>
+                        <p class="node-desc">Predicción de deserción, tutoría automatizada adaptativa y retroalimentación mediante modelos masivos.</p>
+                        <div class="node-meta">
+                            <span>Inteligencia</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="node-card branch-futuro" id="nodeReflexionCritica" data-concept="futuro-lms">
+                        <div class="node-icon-wrapper"><i class="fa-solid fa-comments"></i></div>
+                        <h3 class="node-title">Futuro Crítico</h3>
+                        <p class="node-desc">Headless LMS, ecosistemas de aprendizaje distribuido (LXP) y ética de la vigilancia algorítmica.</p>
+                        <div class="node-meta">
+                            <span>Reflexión</span>
+                            <span class="node-link">Ver Detalles <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Panel Lateral de Detalles (Slide-in Sidebar) -->
+    <aside class="details-sidebar" id="detailsSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title-section">
+                <div class="sidebar-icon" id="sidebarIconBg">
+                    <i id="sidebarIcon" class="fa-solid"></i>
+                </div>
+                <div>
+                    <h2 id="sidebarTitle">Título del Nodo</h2>
+                    <span id="sidebarCategory" class="concept-badge">Categoría</span>
+                </div>
+            </div>
+            <button class="sidebar-close" id="btnSidebarClose">&times;</button>
+        </div>
+
+        <nav class="sidebar-tabs">
+            <button class="sidebar-tab active" data-tab="tabSintesis">Síntesis Conceptual</button>
+            <button class="sidebar-tab" data-tab="tabRelaciones">Relaciones y Conectores</button>
+            <button class="sidebar-tab" data-tab="tabAplicacion">Aplicación Práctica</button>
+        </nav>
+
+        <div class="sidebar-content">
+            <!-- Pestaña 1: Síntesis -->
+            <div class="tab-panel active" id="tabSintesis">
+                <div class="detail-sintesis" id="sidebarSintesisHtml">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <!-- Pestaña 2: Relaciones -->
+            <div class="tab-panel" id="tabRelaciones">
+                <div id="sidebarRelacionesHtml">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+
+            <!-- Pestaña 3: Aplicación -->
+            <div class="tab-panel" id="tabAplicacion">
+                <div class="detail-sintesis" id="sidebarAplicacionHtml">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MODAL 1: Línea del Tiempo Interactiva -->
+    <div class="modal-overlay" id="modalTimelineOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-timeline" style="color: var(--connector-active); margin-right: 10px;"></i> Evolución Histórica de los LMS</h3>
+                <button class="modal-close" id="btnCloseTimeline">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="timeline-container">
+                    <div class="timeline-event">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-year">Años 1960 - 1970</div>
+                        <h4 class="timeline-title">Proyecto PLATO (Univ. de Illinois)</h4>
+                        <p class="timeline-text">Nace el primer sistema de enseñanza asistida por computadora (CAI). Introdujo foros, salas de chat, evaluaciones dinámicas e instrucción individualizada conectada por terminales de red en mainframe.</p>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-year">Año 1990</div>
+                        <h4 class="timeline-title">FirstClass y la Colaboración Asíncrona</h4>
+                        <p class="timeline-text">Considerado uno de los primeros entornos virtuales grupales reales sobre computadoras personales. Permitió correo electrónico privado, foros públicos y compartición básica de archivos académicos.</p>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-year">Año 1997</div>
+                        <h4 class="timeline-title">WebCT (Web Course Tools) y LMS Propietario</h4>
+                        <p class="timeline-text">Creado en la Universidad de Columbia Británica. Fue el primer LMS comercial exitoso a gran escala que integró herramientas de comunicación, foros y autoevaluaciones web. Posteriormente fue adquirido por Blackboard en 2005.</p>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-year">Año 2002</div>
+                        <h4 class="timeline-title">Nacimiento de Moodle (Martin Dougiamas)</h4>
+                        <p class="timeline-text">Se lanza Moodle, revolucionando el mercado con una filosofía fundamentada en el constructivismo social de código abierto (GPL). Permite crear comunidades de aprendizaje personalizables, autónomas y colaborativas en todo el mundo.</p>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-year">Año 2011</div>
+                        <h4 class="timeline-title">SaaS Nativo y Canvas LMS (Instructure)</h4>
+                        <p class="timeline-text">Instructure lanza Canvas LMS, planteando una arquitectura alojada 100% en servidores en la nube pública de Amazon (AWS). Apuesta por la usabilidad inmediata, APIs abiertas, actualizaciones ágiles semanales y conectividad LTI de fácil despliegue.</p>
+                    </div>
+                    <div class="timeline-event">
+                        <div class="timeline-badge"></div>
+                        <div class="timeline-year">Actualidad (Años 2020+)</div>
+                        <h4 class="timeline-title">Plataformas LXP, Analítica e IA</h4>
+                        <p class="timeline-text">Los LMS tradicionales se transforman en plataformas de experiencia de aprendizaje (LXP) que usan Inteligencia Artificial para ofrecer currículos adaptativos individuales, análisis predictivo de reprobación escolar y tutorías virtuales continuas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Tabla Comparativa Interactiva -->
+    <div class="modal-overlay" id="modalComparativaOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-table-list" style="color: var(--connector-active); margin-right: 10px;"></i> Matriz Comparativa General de LMS</h3>
+                <button class="modal-close" id="btnCloseComparativa">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="comparison-table-wrapper">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Criterio / Característica</th>
+                                <th><span class="platform-badge-col badge-moodle"><i class="fa-solid fa-m"></i> Moodle</span></th>
+                                <th><span class="platform-badge-col badge-canvas"><i class="fa-solid fa-compass"></i> Canvas</span></th>
+                                <th><span class="platform-badge-col badge-blackboard"><i class="fa-solid fa-chalkboard"></i> Blackboard</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Modelo de Negocio / Licencia</strong></td>
+                                <td>Código Abierto (GPL v3+). Sin coste de licenciamiento, pero requiere infraestructura, mantenimiento y soporte local.</td>
+                                <td>Comercial SaaS (Suscripción anual). Licenciamiento basado en usuarios activos con alojamiento Cloud incluido.</td>
+                                <td>Privativo Comercial (Licencia anual institucional). Coste premium con soporte oficial y hosting centralizado.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Facilidad de Uso (UI/UX)</strong></td>
+                                <td>Curva de aprendizaje media-alta. Interfaz tradicional que requiere esfuerzo de diseño visual para ser atractiva.</td>
+                                <td>Curva de aprendizaje baja. Interfaz limpia, ágil, altamente intuitiva y responsiva móvil.</td>
+                                <td>Curva de aprendizaje media. Entorno estructurado y formal, recientemente modernizado con Ultra Experience.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Capacidad de Integración</strong></td>
+                                <td>Excelente mediante plugins comunitarios (miles disponibles) y estándares como LTI, SCORM y APIs REST.</td>
+                                <td>Líder de la industria. Ecosistema de integraciones nativas simplificadas en un clic (App Center) y APIs robustas.</td>
+                                <td>Muy alta. Conexiones fuertes corporativas, compatible con LTI, interoperabilidad avanzada y APIs oficiales.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Escalabilidad e Infraestructura</strong></td>
+                                <td>Depende de los servidores locales. Requiere diseño especializado de bases de datos para soportar grandes picos.</td>
+                                <td>Escalabilidad elástica automática instantánea al estar hospedado de manera nativa en la nube (AWS).</td>
+                                <td>Excelente en su oferta Cloud (Managed Hosting o SaaS), respaldada por infraestructura global robusta.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Filosofía y Enfoque Pedagógico</strong></td>
+                                <td>Constructivista social. Foco en la colaboración mediante foros, wikis y talleres entre pares.</td>
+                                <td>Centrado en la eficiencia y aprendizaje activo. Flexibilidad instruccional y retroalimentación multimedia.</td>
+                                <td>Centrado en la evaluación formal institucional, control de plagio y seguimiento estructurado de competencias.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Quiz de Autoevaluación -->
+    <div class="modal-overlay" id="modalQuizOverlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-graduation-cap" style="color: var(--connector-active); margin-right: 10px;"></i> Evaluación de Conocimientos del Ecosistema LMS</h3>
+                <button class="modal-close" id="btnCloseQuiz">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Pantalla Inicial -->
+                <div class="quiz-intro" id="quizIntro">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h4>¿Listo para evaluar tu conocimiento?</h4>
+                    <p>Responde 5 preguntas interactivas sobre interoperabilidad, retos, evolución e IA en plataformas LMS para obtener tu Constancia de Competencia en este módulo.</p>
+                    <div style="margin-bottom: 20px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto;">
+                        <label for="studentNameInput" style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 0.9rem;">Nombre del Estudiante:</label>
+                        <input type="text" id="studentNameInput" class="search-input" style="padding-left: 15px;" placeholder="Ingresa tu nombre completo...">
+                    </div>
+                    <button class="btn-action" id="btnStartQuiz">Iniciar Quiz</button>
+                </div>
+
+                <!-- Preguntas Dinámicas -->
+                <div class="quiz-card" id="quizCard">
+                    <div class="quiz-progress">
+                        <span id="quizProgressText">Pregunta 1 de 5</span>
+                        <div class="quiz-progress-bar-bg">
+                            <div class="quiz-progress-bar-fill" id="quizProgressFill"></div>
+                        </div>
+                        <span id="quizScoreText">Puntos: 0</span>
+                    </div>
+                    <h4 class="quiz-question" id="quizQuestionText">Texto de la pregunta</h4>
+                    <div class="quiz-options" id="quizOptionsContainer">
+                        <!-- Botones Dinámicos -->
+                    </div>
+                    <div class="quiz-feedback" id="quizFeedback">
+                        <!-- Retroalimentación -->
+                    </div>
+                    <div class="quiz-actions">
+                        <button class="btn-action" id="btnNextQuestion" style="display: none;">Siguiente Pregunta</button>
+                    </div>
+                </div>
+
+                <!-- Pantalla de Resultados y Certificado -->
+                <div class="quiz-card" id="quizResultsCard">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h4 id="quizResultsTitle">¡Quiz Completado!</h4>
+                        <p id="quizResultsScoreText" style="font-size: 1.1rem; margin-top: 10px;"></p>
+                    </div>
+                    
+                    <!-- Constancia de Aprendizaje en HTML -->
+                    <div class="certificate-box" id="certificateBox" style="display: none;">
+                        <div class="cert-seal"><i class="fa-solid fa-award"></i></div>
+                        <div class="cert-header">
+                            <h2>Constancia de Logro</h2>
+                            <p>Ecosistema y Arquitectura de Plataformas LMS</p>
+                        </div>
+                        <div class="cert-body">
+                            <p>Se otorga el presente reconocimiento a:</p>
+                            <div class="cert-name" id="certStudentName">Nombre Estudiante</div>
+                            <p class="cert-detail">Por haber completado con éxito la evaluación interactiva sobre estándares (SCORM, LTI, xAPI), evolución histórica, retos técnicos, retos pedagógicos e IA en entornos virtuales de aprendizaje.</p>
+                        </div>
+                        <div class="cert-footer">
+                            <span>Fecha: <span id="certDate">08/06/2026</span></span>
+                            <span>Instructor: Kenneth de Jesús Alcalá Beltrán</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 25px;">
+                        <button class="btn-action" id="btnPrintCertificate" style="display: none; background: linear-gradient(135deg, #11998e, #38ef7d); box-shadow: 0 4px 15px rgba(17,153,142,0.3);"><i class="fa-solid fa-print"></i> Imprimir Constancia</button>
+                        <button class="btn-action" id="btnRestartQuiz" style="background: linear-gradient(135deg, #64748b, #475569); box-shadow: 0 4px 15px rgba(71,85,105,0.3);"><i class="fa-solid fa-rotate-left"></i> Reintentar Evaluación</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de Datos y Lógica General -->
+    <script>
+        // --- 1. BASE DE DATOS DE CONCEPTOS (DETALLADO - SÍNTESIS PROPIA Y CONECTORES) ---
+        const conceptsData = {
+            "root-concept": {
+                title: "Sistemas de Gestión de Aprendizaje (LMS)",
+                icon: "fa-network-wired",
+                category: "Núcleo del Mapa",
+                color: "#1e3c72",
+                sintesis: `
+                    <p>Un <strong>Learning Management System (LMS)</strong> es una plataforma de software diseñada específicamente para planificar, implementar, distribuir y evaluar un proceso de aprendizaje particular. Constituye la infraestructura tecnológica sobre la cual descansa el aprendizaje a distancia y el aprendizaje mixto (blended learning).</p>
+                    <p><strong>Funciones Clave:</strong></p>
+                    <ul>
+                        <li><strong>Gestión de Usuarios:</strong> Registro, perfiles, roles (administrador, docente, estudiante) y matriculación segura.</li>
+                        <li><strong>Distribución de Contenidos:</strong> Almacenamiento y publicación de recursos didácticos digitales.</li>
+                        <li><strong>Comunicación Multicanal:</strong> Canales internos de interacción síncronos (chats) y asíncronos (foros, mensajería).</li>
+                        <li><strong>Seguimiento e Informes:</strong> Recolección automática de logs de actividad, tiempos de conexión y progresos curriculares.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-arrow-right-long"></i> Hacia Fundamentos e Historia</div>
+                        <p>El LMS actual se entiende analizando su evolución histórica desde el mainframe hasta su concepto operativo contemporáneo.</p>
+                    </div>
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-arrow-right-long"></i> Hacia Plataformas Líderes</div>
+                        <p>El concepto abstracto de LMS se materializa comercial y prácticamente en el mercado a través de Moodle, Canvas y Blackboard.</p>
+                    </div>
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-arrow-right-long"></i> Hacia Interoperabilidad y Retos</div>
+                        <p>Un LMS no es un sistema aislado; requiere integrarse, interoperar a través de estándares y responder a retos de escalabilidad informática y diseño instruccional.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>En el ámbito universitario, el LMS sirve como el aula virtual institucional centralizada. El docente carga su planeación, los alumnos entregan tareas digitales y la institución audita las notas oficiales de manera automatizada y validada ante normativas académicas.</p>
+                `
+            },
+            "concepto": {
+                title: "Concepto de LMS",
+                icon: "fa-book-open",
+                category: "Fundamentos",
+                color: "#0284c7",
+                sintesis: `
+                    <p>El concepto moderno de LMS va más allá de un simple repositorio de archivos. Se define como un <strong>ecosistema tecnopedagógico integrado</strong> que orquesta la experiencia del aula virtual.</p>
+                    <p><strong>Pilares de un LMS:</strong></p>
+                    <ul>
+                        <li><strong>Administración:</strong> Carga masiva de cursos y enrolamiento mediante sistemas externos (ej. Banner, SAP).</li>
+                        <li><strong>Accesibilidad:</strong> Acceso multiplataforma y multidispositivo permanente.</li>
+                        <li><strong>Interactividad:</strong> Espacios de construcción colaborativa de conocimiento (wikis, glosarios, foros).</li>
+                        <li><strong>Flexibilidad y Modularidad:</strong> Capacidad de adaptarse a planes curriculares diversos y a métodos pedagógicos heterogéneos.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conector: Deriva de...</div>
+                        <p>Nace de la necesidad de trasladar la logística presencial de una escuela al ciberespacio, convirtiéndose en el núcleo de la categoría "Fundamentos e Historia".</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p><strong>Caso Práctico:</strong> Un LMS implementado para educación médica permite a los estudiantes repasar vídeos quirúrgicos asíncronos antes de realizar evaluaciones formativas basadas en casos clínicos reales.</p>
+                `
+            },
+            "evolucion": {
+                title: "Evolución Histórica",
+                icon: "fa-clock-rotate-left",
+                category: "Historia",
+                color: "#0284c7",
+                sintesis: `
+                    <p>La evolución de los LMS refleja la propia historia del internet y la computación:</p>
+                    <ul>
+                        <li><strong>1960 - PLATO:</strong> Demostró la viabilidad de la enseñanza individualizada asistida por ordenador en terminales compartidas.</li>
+                        <li><strong>1990 - FirstClass:</strong> Introdujo la dimensión social y de comunicación (correo y foros) en el e-learning primigenio.</li>
+                        <li><strong>1997 - WebCT / Blackboard:</strong> Consolidó el mercado comercial y estandarizó las funciones de entrega académica y exámenes estructurados en línea.</li>
+                        <li><strong>2002 - Moodle:</strong> Nace el e-learning libre y comunitario bajo una sólida base de colaboración pedagógica constructivista.</li>
+                        <li><strong>2011 - Canvas LMS:</strong> Forzó la transición definitiva a la nube elástica (SaaS) y priorizó el enfoque de integración a través de APIs públicas.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conector: Explica la evolución de...</div>
+                        <p>Los hitos históricos explican por qué las plataformas actuales han adoptado ciertos estándares técnicos y metodologías en detrimento de sistemas rígidos del pasado.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Haz clic en el botón <strong>"Línea del Tiempo"</strong> en la cabecera para interactuar visualmente con los años, eventos y descripciones a detalle de esta evolución.</p>
+                `
+            },
+            "moodle": {
+                title: "Moodle LMS",
+                icon: "fa-m",
+                category: "Plataformas",
+                color: "#ea580c",
+                sintesis: `
+                    <p><strong>Moodle</strong> (Modular Object-Oriented Dynamic Learning Environment) es la plataforma de código abierto más utilizada a nivel global. Fundada por Martin Dougiamas en 2002, se basa en la teoría del <strong>constructivismo social</strong>, donde el aprendizaje se potencia cuando los estudiantes construyen colaborativamente el conocimiento.</p>
+                    <p><strong>Ventajas Clave:</strong> Código libre y gratuito de descarga, comunidad de soporte global masiva, miles de plugins listos para su uso y soberanía absoluta sobre los datos y el servidor.</p>
+                    <p><strong>Desventajas:</strong> Alta complejidad técnica de instalación, requiere mantenimiento, actualizaciones delicadas y puede requerir un rediseño UI severo para verse moderno.</p>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-code-compare"></i> Relación de Oposición</div>
+                        <p>Se contrapone a Canvas y Blackboard al ofrecer un modelo no centralizado de código libre, permitiendo control total pero exigiendo mayor presupuesto en soporte técnico institucional.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Muy adoptada en universidades públicas y centros educativos de bajos recursos que cuentan con un departamento de tecnologías interno capaz de mantener y parametrizar los servidores.</p>
+                `
+            },
+            "canvas": {
+                title: "Canvas LMS",
+                icon: "fa-compass",
+                category: "Plataformas",
+                color: "#ea580c",
+                sintesis: `
+                    <p><strong>Canvas LMS</strong>, creado por Instructure en 2011, es el líder actual de e-learning SaaS en educación superior. Fue diseñado para solventar la pesadez de Moodle y los costes de infraestructura local de Blackboard.</p>
+                    <p><strong>Puntos Fuertes:</strong> 100% hospedado en la nube elástica de AWS (nunca sufre caídas por sobredemanda de exámenes), interfaz moderna orientada a la experiencia de usuario móvil, actualizaciones invisibles en producción y APIs REST potentes para integración rápida.</p>
+                    <p><strong>Limitaciones:</strong> Costes anuales recurrentes de suscripción y nula personalización del núcleo del sistema (las modificaciones deben ser mediante integraciones LTI autorizadas).</p>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-code-compare"></i> Relación de Integración</div>
+                        <p>Se asocia estrechamente con el concepto de "Herramientas Externas" y estándares como LTI, ya que su estrategia es ser un núcleo limpio que interactúa dinámicamente con software de terceros.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Utilizado ampliamente por prestigiosas universidades privadas mundiales que buscan ofrecer una experiencia de usuario de primer nivel a sus estudiantes y evitar la carga administrativa de sostener data centers de servidores educativos.</p>
+                `
+            },
+            "blackboard": {
+                title: "Blackboard Learn",
+                icon: "fa-chalkboard",
+                category: "Plataformas",
+                color: "#ea580c",
+                sintesis: `
+                    <p><strong>Blackboard</strong> es uno de los pioneros comerciales en el sector de los LMS. Con décadas en el mercado, se destaca por su solidez corporativa y el soporte premium ofrecido a las instituciones educativas.</p>
+                    <p><strong>Características:</strong> Motor de evaluación sumativa extremadamente potente, herramientas de analítica institucional integradas y control de plagio nativo (SafeAssign). Su versión Ultra Experience rediseñó por completo el sistema para adaptarlo a flujos móviles.</p>
+                    <p><strong>Desventajas:</strong> Coste de licenciamiento muy elevado, rigidez tradicional de cursos en algunas arquitecturas previas y menor dinamismo de integraciones libres respecto a Canvas.</p>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-code-compare"></i> Relación Histórica</div>
+                        <p>Representa el paradigma del LMS tradicional institucional, centrado en la seguridad informática y la evaluación rigurosa.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Elegido por grandes universidades consolidadas, academias militares e instituciones gubernamentales donde la seguridad de los datos, el control estricto de accesos y la auditoría formativa son mandatos legales críticos.</p>
+                `
+            },
+            "scorm": {
+                title: "SCORM estándar",
+                icon: "fa-box-archive",
+                category: "Interoperabilidad",
+                color: "#059669",
+                sintesis: `
+                    <p><strong>SCORM</strong> (Sharable Content Object Reference Model) es un estándar clásico de e-learning creado en los años 2000 por la ADL (iniciativa del Departamento de Defensa de EE. UU.). Define cómo empaquetar contenidos didácticos interactivos en archivos ZIP para que puedan importarse en cualquier LMS compatible.</p>
+                    <p><strong>Características de Seguimiento:</strong></p>
+                    <ul>
+                        <li>Registra estados: Completado / No Completado.</li>
+                        <li>Registra notas simples: Calificación de quizzes embebidos.</li>
+                        <li>Registra el tiempo de visualización del alumno.</li>
+                    </ul>
+                    <p><strong>Limitaciones Críticas:</strong> Funciona mediante código Javascript dentro del navegador (si el navegador se cierra o pierde conexión, se pierde el progreso) y está limitado a registrar solo lo que ocurre dentro del LMS.</p>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-shuffle"></i> Comparación en el Eje de Interoperabilidad</div>
+                        <p>Es el antecesor de xAPI. Mientras SCORM es un paquete rígido dependiente del navegador web, xAPI funciona mediante llamados HTTP independientes del LMS y del navegador.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Ampliamente usado por empresas generadoras de cursos corporativos estándar (ej. Cursos de seguridad en el trabajo o ética corporativa) creados con herramientas autorales como Articulate Storyline o Adobe Captivate.</p>
+                `
+            },
+            "lti": {
+                title: "LTI Integración",
+                icon: "fa-link",
+                category: "Interoperabilidad",
+                color: "#059669",
+                sintesis: `
+                    <p><strong>LTI</strong> (Learning Tools Interoperability) es un estándar promovido por 1EdTech (antes IMS Global) que define un método seguro para interconectar aplicaciones externas de aprendizaje con una plataforma LMS.</p>
+                    <p><strong>Cómo Funciona:</strong></p>
+                    <ul>
+                        <li>Permite que una app de terceros (ej. Zoom, un laboratorio virtual interactivo, o YouTube) se embeba de forma integrada dentro del LMS.</li>
+                        <li><strong>SSO Seguro:</strong> El alumno ingresa al simulador externo sin reintroducir contraseñas. LTI pasa de forma cifrada el ID de usuario y su rol.</li>
+                        <li><strong>Paso de Calificaciones:</strong> La herramienta externa puede escribir de regreso calificaciones directamente en el libro de calificaciones del LMS principal.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-arrows-spin"></i> Relación con Herramientas Externas</div>
+                        <p>Es la tecnología base y estándar que hace posible la integración fluida con herramientas externas, evitando que los administradores de sistemas programen APIs propietarias para cada aplicación.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p><strong>Ejemplo de Aula:</strong> El profesor incrusta una simulación LTI interactiva de física de PhET. El alumno realiza la simulación en la pantalla y, al terminar, el simulador envía la puntuación obtenida directamente a la libreta de calificaciones de Canvas o Moodle.</p>
+                `
+            },
+            "xapi": {
+                title: "xAPI (Tin Can API)",
+                icon: "fa-database",
+                category: "Interoperabilidad",
+                color: "#059669",
+                sintesis: `
+                    <p><strong>xAPI</strong> (Experience API / originalmente Tin Can) es la especificación moderna de interoperabilidad. Parte de la premisa de que el aprendizaje ocurre en múltiples contextos, no solo dentro de un navegador visualizando un curso estructurado en el LMS.</p>
+                    <p><strong>Arquitectura:</strong></p>
+                    <ul>
+                        <li>Funciona mediante enunciados semánticos de tipo <strong>"Sujeto + Verbo + Objeto"</strong> (ej. "Carlos completó el simulador de vuelo con 95 puntos").</li>
+                        <li>Estos enunciados se envían mediante peticiones REST seguras a un almacén de datos especializado llamado <strong>LRS (Learning Record Store)</strong>, el cual puede ser externo o estar embebido en el LMS.</li>
+                        <li>Registra actividades en apps móviles, realidad virtual, lecturas offline, juegos o actividades colaborativas físicas.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-arrow-right-long"></i> Relación con Analítica de Aprendizaje</div>
+                        <p>xAPI es el gran alimentador de la Analítica y la IA, ya que provee una base de datos de actividades del alumno inmensamente más rica, detallada y en tiempo real que los resúmenes estáticos de SCORM.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p><strong>Uso Práctico:</strong> En adiestramiento militar o médico, se monitoriza al estudiante mientras opera un maniquí inteligente o casco de realidad virtual. Los sensores envían enunciados xAPI al LRS sin necesidad de abrir un LMS.</p>
+                `
+            },
+            "integraciones": {
+                title: "Herramientas Externas",
+                icon: "fa-circle-nodes",
+                category: "Integraciones",
+                color: "#059669",
+                sintesis: `
+                    <p>El ecosistema moderno exige que el LMS actúe como un centro neurálgico conectado a herramientas externas. Esto se logra mediante tres tecnologías clave:</p>
+                    <ul>
+                        <li><strong>APIs REST:</strong> Permiten transferencias bidireccionales síncronas de datos (ej. Sincronizar calendarios de exámenes con Google Calendar o Teams).</li>
+                        <li><strong>Webhooks:</strong> Envío automático de notificaciones basadas en eventos (ej. Notificar a Discord cuando un alumno sube una tarea).</li>
+                        <li><strong>OAuth2 y SSO (Single Sign-On):</strong> Estándares de autenticación federada segura que permiten que el alumno navegue por todo el ecosistema digital institucional usando una sola credencial (ej. Cuenta institucional de Microsoft o Google).</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conector: Habilita el ecosistema en...</div>
+                        <p>Permite que las plataformas líderes (Moodle, Canvas, Blackboard) dejen de ser islas cerradas y se transformen en componentes integrados a sistemas escolares (ERP) o corporativos (CRM).</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p><strong>Ejemplo:</strong> Integrar Microsoft Teams en Moodle para que, al crear una sesión interactiva síncrona en el LMS, se genere automáticamente la videollamada y los enlaces de acceso para los alumnos.</p>
+                `
+            },
+            "retos-tecnicos": {
+                title: "Retos Técnicos",
+                icon: "fa-shield-halved",
+                category: "Retos",
+                color: "#dc2626",
+                sintesis: `
+                    <p>La operación informática de un LMS a gran escala enfrenta desafíos técnicos complejos:</p>
+                    <ul>
+                        <li><strong>Seguridad de Datos y Privacidad:</strong> Cumplir con regulaciones internacionales estrictas (como GDPR o FERPA) para salvaguardar notas, correos y datos financieros, además de encriptar la comunicación web (HTTPS/WSS).</li>
+                        <li><strong>Escalabilidad Dinámica:</strong> Soportar miles de peticiones simultáneas de estudiantes enviando un examen crítico o cargando archivos de vídeo a la misma hora en la semana de exámenes finales.</li>
+                        <li><strong>Disponibilidad y Confiabilidad:</strong> Cumplir con Acuerdos de Nivel de Servicio (SLA) del 99.9% o superior, evitando caídas inesperadas que detengan los calendarios escolares oficiales.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conectado con Retos Pedagógicos</div>
+                        <p>Los fallos técnicos (caídas del sistema, lentitud) impactan directamente en la confianza pedagógica y arruinan la experiencia del aprendizaje activo de los usuarios.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Las arquitecturas cloud modernas (como las que usa Canvas) resuelven este reto separando los servidores de bases de datos del almacenamiento y habilitando autoescaladores elásticos que aprovisionan más servidores automáticamente cuando detectan picos de tráfico.</p>
+                `
+            },
+            "retos-pedagogicos": {
+                title: "Retos Pedagógicos",
+                icon: "fa-people-group",
+                category: "Retos",
+                color: "#dc2626",
+                sintesis: `
+                    <p>La efectividad de la educación en línea depende de superar los retos de la didáctica digital:</p>
+                    <ul>
+                        <li><strong>Diseño Instruccional Adaptado:</strong> Evitar la tendencia ineficaz de convertir un aula presencial en un "LMS cementerio de PDFs". Exige planificar rutas interactivas, narrativas visuales y materiales enriquecidos.</li>
+                        <li><strong>Aprendizaje Activo en Entornos Virtuales:</strong> Diseñar foros de debate significativos, talleres interactivos y proyectos colaborativos para evitar la pasividad cognitiva del estudiante detrás de la pantalla.</li>
+                        <li><strong>Evaluación Formativa Confiable:</strong> Transicionar de exámenes tradicionales de opción múltiple con gran riesgo de plagio hacia portafolios de evidencias, autoevaluaciones reflexivas y retroalimentación interactiva docente-estudiante.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conector: Exige soluciones de...</div>
+                        <p>La resolución de los retos pedagógicos se beneficia enormemente de la Analítica de Datos y las herramientas de IA, las cuales pueden aportar analíticas del compromiso y retroalimentaciones cualitativas detalladas.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Un docente de informática utiliza el LMS no solo para calificar código escrito por sus alumnos, sino que utiliza rúbricas interactivas y comentarios en audio dentro del aula virtual para guiar la depuración de errores lógicos del programa del alumno.</p>
+                `
+            },
+            "analitica-ia": {
+                title: "Analítica del Aprendizaje e IA",
+                icon: "fa-brain",
+                category: "Futuro",
+                color: "#7c3aed",
+                sintesis: `
+                    <p>La combinación de analíticas de datos e inteligencia artificial está remodelando la experiencia dentro del LMS:</p>
+                    <ul>
+                        <li><strong>Analítica Predictiva (Learning Analytics):</strong> Algoritmos que analizan patrones de comportamiento (días sin conexión, baja de participación, retraso en entregas) para alertar preventivamente sobre estudiantes en riesgo de deserción o reprobación.</li>
+                        <li><strong>Tutoría Inteligente Basada en IA:</strong> Agentes virtuales 24/7 que guían y responden preguntas recurrentes de los alumnos, aclaran dudas de conceptos complejos y sugieren lecturas específicas basados en sus fallos del sistema.</li>
+                        <li><strong>Adaptabilidad Curricular Dinámica:</strong> Modificaciones automatizadas de las rutas de aprendizaje. Si el sistema detecta que un estudiante domina rápido un concepto, lo promueve a temas avanzados o, en caso contrario, le asigna explicaciones adicionales personalizadas de forma autónoma.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conector: Alimenta a...</div>
+                        <p>La IA escolar procesa los datos recogidos por los estándares de interoperabilidad (como xAPI) y busca mitigar de forma automatizada los retos pedagógicos y de retención estudiantil.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p>Plataformas que usan inteligencia artificial pueden calificar automáticamente borradores de ensayos identificando faltas de argumentación o coherencia y sugiriendo mejoras de redacción personalizadas antes de la entrega final.</p>
+                `
+            },
+            "futuro-lms": {
+                title: "Reflexión Crítica y Futuro",
+                icon: "fa-comments",
+                category: "Futuro",
+                color: "#7c3aed",
+                sintesis: `
+                    <p>El LMS tradicional monolítico y centrado en cursos rígidos se enfrenta a cambios disruptivos:</p>
+                    <ul>
+                        <li><strong>El auge de LXP (Learning Experience Platforms):</strong> Plataformas centradas en el estudiante y en el aprendizaje informal, con recomendadores dinámicos algorítmicos al estilo de plataformas de streaming (ej. Degreed, EdCast).</li>
+                        <li><strong>LMS Desacoplados (Headless LMS):</strong> La separación de la interfaz de usuario del backend de aprendizaje, permitiendo que la interacción ocurra directamente en apps móviles dedicadas, simuladores o videojuegos educativos.</li>
+                        <li><strong>El debate Ético de la Vigilancia Algorítmica:</strong> La monitorización biométrica en evaluaciones en línea (proctoring) o el escaneo predictivo de deserción escolar abren cuestionamientos sobre la invasión a la privacidad, sesgos raciales y discriminación por condiciones socioeconómicas.</li>
+                    </ul>
+                `,
+                relaciones: `
+                    <div class="relation-card">
+                        <div class="relation-title"><i class="fa-solid fa-link"></i> Conector: Conclusión general de...</div>
+                        <p>Cierra el ciclo conceptual al confrontar las limitaciones del e-learning actual con las tendencias éticas y tecnológicas del futuro educativo.</p>
+                    </div>
+                `,
+                aplicacion: `
+                    <p><strong>Reflexión Crítica Final:</strong> El futuro del aprendizaje digital no radica en diseñar tecnologías de control escolar más intrusivas, sino en consolidar plataformas abiertas que empoderen al estudiante a ser dueño de su propia ruta y portabilidad de datos curriculares de por vida.</p>
+                `
+            }
+        };
+
+        // --- 2. BASE DE PREGUNTAS DEL QUIZ ---
+        const quizQuestions = [
+            {
+                q: "¿Qué estándar de interoperabilidad permite incrustar de forma segura una aplicación interactiva externa (ej. simulador) dentro de un LMS y transferir calificaciones de regreso?",
+                o: ["SCORM", "LTI (Learning Tools Interoperability)", "xAPI (Tin Can)", "APIs REST propietarias"],
+                c: 1,
+                feedback: "LTI establece una conexión segura bidireccional (SSO y paso de notas) optimizada para incrustar aplicaciones interactivas externas en plataformas educativas."
+            },
+            {
+                q: "Si deseamos registrar actividades de aprendizaje fuera del LMS (por ejemplo, el uso de una app móvil de idiomas o el entrenamiento con cascos de realidad virtual), ¿qué estándar moderno es el adecuado?",
+                o: ["SCORM 1.2", "HTML5", "xAPI (Tin Can API)", "LTI 1.3"],
+                c: 2,
+                feedback: "xAPI utiliza enunciados ('Sujeto-Verbo-Objeto') para enviar experiencias de aprendizaje a un LRS desde cualquier dispositivo conectado, superando las limitaciones del LMS."
+            },
+            {
+                q: "¿Cuál de los siguientes LMS se destaca históricamente por basar su desarrollo e interfaz en una sólida teoría pedagógica del Constructivismo Social, siendo además software libre?",
+                o: ["Canvas LMS", "Blackboard Learn", "Sakai Project", "Moodle LMS"],
+                c: 3,
+                feedback: "Moodle fue creado por Martin Dougiamas con la filosofía constructivista de que la educación es más efectiva mediante la creación colaborativa de conocimientos."
+            },
+            {
+                q: "Un pico masivo de estudiantes intentando entregar una tarea a las 11:59 PM es un ejemplo de desafío directo a:",
+                o: ["El Diseño Instruccional", "La Escalabilidad Técnica", "La Analítica Predictiva", "La Interoperabilidad de contenidos"],
+                c: 1,
+                feedback: "La escalabilidad técnica es la capacidad de un sistema de responder sin caídas de servicio ante aumentos repentinos y significativos de la carga de tráfico web."
+            },
+            {
+                q: "¿Qué tecnología permite predecir de forma temprana si un estudiante universitario corre el riesgo de reprobar una materia analizando sus registros de comportamiento digital?",
+                o: ["SCORM y Webhooks", "Analítica del Aprendizaje (Learning Analytics)", "Single Sign-On (SSO)", "Headless LMS"],
+                c: 1,
+                feedback: "La analítica del aprendizaje recolecta la huella digital para identificar de forma automatizada patrones asociados con el abandono escolar o bajo rendimiento."
+            }
+        ];
+
+        // --- 3. LÓGICA DE DIBUJO DE CONECTORES SVG ---
+        const connectorsSvg = document.getElementById('connectorsSvg');
+        const mapCanvas = document.getElementById('mapCanvas');
+
+        // Mapeo de conexiones jerárquicas (Parent ID -> Child ID, Dirección de conexión)
+        const connections = [
+            // Root -> Categorías
+            { parent: 'nodeRoot', child: 'nodeCatFundamentos', dir: 'left-to-left' },
+            { parent: 'nodeRoot', child: 'nodeCatPlataformas', dir: 'left-to-left' },
+            { parent: 'nodeRoot', child: 'nodeCatInteroperabilidad', dir: 'right-to-right' },
+            { parent: 'nodeRoot', child: 'nodeCatRetos', dir: 'right-to-right' },
+            { parent: 'nodeRoot', child: 'nodeCatFuturo', dir: 'right-to-right' },
+
+            // Categoría Fundamentos -> Hijos
+            { parent: 'nodeCatFundamentos', child: 'nodeConceptoLMS', dir: 'left-to-right' },
+            { parent: 'nodeCatFundamentos', child: 'nodeEvolucionLMS', dir: 'left-to-right' },
+
+            // Categoría Plataformas -> Hijos
+            { parent: 'nodeCatPlataformas', child: 'nodeMoodle', dir: 'left-to-right' },
+            { parent: 'nodeCatPlataformas', child: 'nodeCanvas', dir: 'left-to-right' },
+            { parent: 'nodeCatPlataformas', child: 'nodeBlackboard', dir: 'left-to-right' },
+
+            // Categoría Interoperabilidad -> Hijos
+            { parent: 'nodeCatInteroperabilidad', child: 'nodeSCORM', dir: 'right-to-left' },
+            { parent: 'nodeCatInteroperabilidad', child: 'nodeLTI', dir: 'right-to-left' },
+            { parent: 'nodeCatInteroperabilidad', child: 'nodeXAPI', dir: 'right-to-left' },
+            { parent: 'nodeCatInteroperabilidad', child: 'nodeIntegracionExt', dir: 'right-to-left' },
+
+            // Categoría Retos -> Hijos
+            { parent: 'nodeCatRetos', child: 'nodeRetosTecnicos', dir: 'right-to-left' },
+            { parent: 'nodeCatRetos', child: 'nodeRetosPedagogicos', dir: 'right-to-left' },
+
+            // Categoría Futuro -> Hijos
+            { parent: 'nodeCatFuturo', child: 'nodeAnaliticaIA', dir: 'right-to-left' },
+            { parent: 'nodeCatFuturo', child: 'nodeReflexionCritica', dir: 'right-to-left' }
+        ];
+
+        // Dibuja todas las líneas de conexión dinámicamente
+        function drawConnections() {
+            // Limpiar líneas anteriores excepto definiciones
+            const oldPaths = connectorsSvg.querySelectorAll('.connector-path');
+            oldPaths.forEach(p => p.remove());
+
+            const canvasRect = mapCanvas.getBoundingClientRect();
+
+            connections.forEach(conn => {
+                const parentEl = document.getElementById(conn.parent);
+                const childEl = document.getElementById(conn.child);
+
+                if (!parentEl || !childEl) return;
+                
+                // Si el hijo está colapsado (no visible), omitimos el conector
+                if (childEl.classList.contains('collapsed-branch')) return;
+
+                const parentRect = parentEl.getBoundingClientRect();
+                const childRect = childEl.getBoundingClientRect();
+
+                let x1, y1, x2, y2;
+
+                // Determinación inteligente de puntos de conector
+                if (conn.dir === 'left-to-left') {
+                    // Del centro izquierdo del Root al centro derecho de categorías izquierdas
+                    x1 = (parentRect.left - canvasRect.left) / currentZoom;
+                    y1 = (parentRect.top + parentRect.height / 2 - canvasRect.top) / currentZoom;
+                    x2 = (childRect.right - canvasRect.left) / currentZoom;
+                    y2 = (childRect.top + childRect.height / 2 - canvasRect.top) / currentZoom;
+                } else if (conn.dir === 'left-to-right') {
+                    // De categorías izquierdas a sus hijos de más a la izquierda
+                    x1 = (parentRect.left - canvasRect.left) / currentZoom;
+                    y1 = (parentRect.top + parentRect.height / 2 - canvasRect.top) / currentZoom;
+                    x2 = (childRect.right - canvasRect.left) / currentZoom;
+                    y2 = (childRect.top + childRect.height / 2 - canvasRect.top) / currentZoom;
+                } else if (conn.dir === 'right-to-right') {
+                    // Del centro derecho del Root al centro izquierdo de categorías derechas
+                    x1 = (parentRect.right - canvasRect.left) / currentZoom;
+                    y1 = (parentRect.top + parentRect.height / 2 - canvasRect.top) / currentZoom;
+                    x2 = (childRect.left - canvasRect.left) / currentZoom;
+                    y2 = (childRect.top + childRect.height / 2 - canvasRect.top) / currentZoom;
+                } else if (conn.dir === 'right-to-left') {
+                    // De categorías derechas a sus hijos de más a la derecha
+                    x1 = (parentRect.right - canvasRect.left) / currentZoom;
+                    y1 = (parentRect.top + parentRect.height / 2 - canvasRect.top) / currentZoom;
+                    x2 = (childRect.left - canvasRect.left) / currentZoom;
+                    y2 = (childRect.top + childRect.height / 2 - canvasRect.top) / currentZoom;
+                }
+
+                // Generar curva Bézier suave
+                const dx = Math.abs(x2 - x1);
+                const controlOffset = dx * 0.45;
+                
+                let p1x, p1y, p2x, p2y;
+                if (x2 < x1) {
+                    p1x = x1 - controlOffset;
+                    p1y = y1;
+                    p2x = x2 + controlOffset;
+                    p2y = y2;
+                } else {
+                    p1x = x1 + controlOffset;
+                    p1y = y1;
+                    p2x = x2 - controlOffset;
+                    p2y = y2;
+                }
+
+                const pathData = `M ${x1} ${y1} C ${p1x} ${p1y}, ${p2x} ${p2y}, ${x2} ${y2}`;
+
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', pathData);
+                path.setAttribute('class', 'connector-path');
+                path.setAttribute('marker-end', 'url(#arrow)');
+                path.dataset.parent = conn.parent;
+                path.dataset.child = conn.child;
+
+                // Si alguno de los nodos conectados está activo, destacar la línea
+                if (parentEl.classList.contains('highlighted') || childEl.classList.contains('highlighted')) {
+                    path.classList.add('active');
+                    path.setAttribute('marker-end', 'url(#arrow-active)');
+                }
+
+                connectorsSvg.appendChild(path);
+            });
+        }
+
+        // --- 4. CONTROL DE ZOOM Y PANEO (ZOOM & PAN CANVAS) ---
+        const mapViewport = document.getElementById('mapViewport');
+        let currentZoom = 0.85;
+        let panX = 100;
+        let panY = 0;
+        let isDragging = false;
+        let startX, startY;
+
+        function updateCanvasTransform() {
+            mapCanvas.style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
+            // Redibujar conexiones para evitar desalineaciones por renderizado de sub-pixeles
+            drawConnections();
+        }
+
+        // Paneo con el Ratón (Mouse Drag to Pan)
+        mapViewport.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.node-card') || e.target.closest('.btn-tool') || e.target.closest('.node-collapse-btn')) return;
+            isDragging = true;
+            mapViewport.classList.add('grabbing');
+            startX = e.clientX - panX * currentZoom;
+            startY = e.clientY - panY * currentZoom;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            panX = (e.clientX - startX) / currentZoom;
+            panY = (e.clientY - startY) / currentZoom;
+            updateCanvasTransform();
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            mapViewport.classList.remove('grabbing');
+        });
+
+        // Zoom con la Rueda del Ratón (Mouse Wheel to Zoom)
+        mapViewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const zoomFactor = 0.05;
+            if (e.deltaY < 0) {
+                currentZoom = Math.min(1.5, currentZoom + zoomFactor);
+            } else {
+                currentZoom = Math.max(0.4, currentZoom - zoomFactor);
+            }
+            updateCanvasTransform();
+        });
+
+        // Botones de control del Toolbar
+        document.getElementById('btnZoomIn').addEventListener('click', () => {
+            currentZoom = Math.min(1.5, currentZoom + 0.1);
+            updateCanvasTransform();
+        });
+
+        document.getElementById('btnZoomOut').addEventListener('click', () => {
+            currentZoom = Math.max(0.4, currentZoom - 0.1);
+            updateCanvasTransform();
+        });
+
+        document.getElementById('btnZoomReset').addEventListener('click', () => {
+            currentZoom = 0.85;
+            panX = 100;
+            panY = 0;
+            updateCanvasTransform();
+            
+            // Reestablecer búsqueda y filtros
+            document.getElementById('searchInput').value = "";
+            document.querySelectorAll('.node-card').forEach(n => {
+                n.classList.remove('dimmed', 'highlighted');
+            });
+            drawConnections();
+        });
+
+        // --- 5. COLAPSO DE RAMAS (COLLAPSIBLE BRANCHES) ---
+        function setupCollapseToggle(btnId, childNodeIds, isLeft = false) {
+            const btn = document.getElementById(btnId);
+            let collapsed = false;
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Evita abrir detalles de la categoría
+                collapsed = !collapsed;
+
+                childNodeIds.forEach(id => {
+                    const node = document.getElementById(id);
+                    if (collapsed) {
+                        node.classList.add('collapsed-branch');
+                    } else {
+                        node.classList.remove('collapsed-branch');
+                    }
+                });
+
+                // Cambiar el icono del botón
+                if (collapsed) {
+                    btn.innerHTML = isLeft ? '<i class="fa-solid fa-chevron-right"></i>' : '<i class="fa-solid fa-chevron-left"></i>';
+                    btn.closest('.node-card').style.opacity = "0.75";
+                } else {
+                    btn.innerHTML = isLeft ? '<i class="fa-solid fa-chevron-left"></i>' : '<i class="fa-solid fa-chevron-right"></i>';
+                    btn.closest('.node-card').style.opacity = "1";
+                }
+
+                drawConnections();
+            });
+        }
+
+        // Inicializar colapsos para cada categoría
+        setupCollapseToggle('btnCollapseFundamentos', ['nodeConceptoLMS', 'nodeEvolucionLMS'], true);
+        setupCollapseToggle('btnCollapsePlataformas', ['nodeMoodle', 'nodeCanvas', 'nodeBlackboard'], true);
+        setupCollapseToggle('btnCollapseInterop', ['nodeSCORM', 'nodeLTI', 'nodeXAPI', 'nodeIntegracionExt']);
+        setupCollapseToggle('btnCollapseRetos', ['nodeRetosTecnicos', 'nodeRetosPedagogicos']);
+        setupCollapseToggle('btnCollapseFuturo', ['nodeAnaliticaIA', 'nodeReflexionCritica']);
+
+
+        // --- 6. BUSCADOR EN TIEMPO REAL ---
+        const searchInput = document.getElementById('searchInput');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (query === "") {
+                // Si está vacío, reestablecer opacidades
+                document.querySelectorAll('.node-card').forEach(n => {
+                    n.classList.remove('dimmed', 'highlighted');
+                });
+                drawConnections();
+                return;
+            }
+
+            document.querySelectorAll('.node-card').forEach(card => {
+                const title = card.querySelector('.node-title').textContent.toLowerCase();
+                const desc = card.querySelector('.node-desc').textContent.toLowerCase();
+                const conceptKey = card.dataset.concept;
+                const conceptObj = conceptsData[conceptKey];
+                
+                let matches = title.includes(query) || desc.includes(query);
+
+                if (conceptObj) {
+                    const sintesisText = conceptObj.sintesis.toLowerCase();
+                    const aplicacionText = conceptObj.aplicacion.toLowerCase();
+                    matches = matches || sintesisText.includes(query) || aplicacionText.includes(query);
+                }
+
+                if (matches) {
+                    card.classList.remove('dimmed');
+                    card.classList.add('highlighted');
+                    
+                    // Si el nodo es hijo y está colapsado por su padre, expandirlo para mostrar el resultado
+                    if (card.classList.contains('collapsed-branch')) {
+                        card.classList.remove('collapsed-branch');
+                    }
+                } else {
+                    card.classList.add('dimmed');
+                    card.classList.remove('highlighted');
+                }
+            });
+
+            // Redibujar conexiones para destacar las activas
+            drawConnections();
+        });
+
+
+        // --- 7. PANEL DE DETALLES INTERACTIVO ---
+        const detailsSidebar = document.getElementById('detailsSidebar');
+        const sidebarTitle = document.getElementById('sidebarTitle');
+        const sidebarCategory = document.getElementById('sidebarCategory');
+        const sidebarIcon = document.getElementById('sidebarIcon');
+        const sidebarIconBg = document.getElementById('sidebarIconBg');
+        const sidebarSintesisHtml = document.getElementById('sidebarSintesisHtml');
+        const sidebarRelacionesHtml = document.getElementById('sidebarRelacionesHtml');
+        const sidebarAplicacionHtml = document.getElementById('sidebarAplicacionHtml');
+
+        let activeConcept = null;
+
+        // Abrir detalles al hacer clic en un nodo
+        document.querySelectorAll('.node-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const conceptKey = card.dataset.concept;
+                const concept = conceptsData[conceptKey];
+
+                if (!concept) return;
+
+                activeConcept = concept;
+
+                // Rellenar información
+                sidebarTitle.textContent = concept.title;
+                sidebarCategory.textContent = concept.category;
+                
+                // Rellenar icono
+                sidebarIcon.className = `fa-solid ${concept.icon}`;
+                
+                // Color de Rama en el fondo de icono
+                sidebarIconBg.style.backgroundColor = concept.color || 'var(--color-root)';
+                sidebarCategory.style.color = concept.color || 'var(--connector-active)';
+                sidebarCategory.style.background = `${concept.color}15` || 'rgba(59,130,246,0.1)';
+
+                // Cargar pestañas
+                sidebarSintesisHtml.innerHTML = concept.sintesis;
+                sidebarRelacionesHtml.innerHTML = concept.relaciones;
+                sidebarAplicacionHtml.innerHTML = concept.aplicacion;
+
+                // Destacar el nodo seleccionado en el mapa
+                document.querySelectorAll('.node-card').forEach(n => n.classList.remove('highlighted'));
+                card.classList.add('highlighted');
+
+                // Abrir Sidebar
+                detailsSidebar.classList.add('open');
+                
+                // Redibujar conexiones
+                drawConnections();
+            });
+        });
+
+        // Cerrar Sidebar
+        document.getElementById('btnSidebarClose').addEventListener('click', () => {
+            detailsSidebar.classList.remove('open');
+            document.querySelectorAll('.node-card').forEach(n => n.classList.remove('highlighted'));
+            drawConnections();
+        });
+
+        // Manejo de Pestañas del Panel Lateral (Sidebar Tabs)
+        document.querySelectorAll('.sidebar-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const panelId = tab.dataset.tab;
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+
+
+        // --- 8. GESTIÓN DE MODALES ---
+        function setupModal(triggerBtnId, overlayId, closeBtnId) {
+            const btn = document.getElementById(triggerBtnId);
+            const overlay = document.getElementById(overlayId);
+            const closeBtn = document.getElementById(closeBtnId);
+
+            btn.addEventListener('click', () => overlay.classList.add('open'));
+            closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('open');
+            });
+        }
+
+        // Inicializar los tres modales principales
+        setupModal('btnOpenTimeline', 'modalTimelineOverlay', 'btnCloseTimeline');
+        setupModal('btnOpenComparativa', 'modalComparativaOverlay', 'btnCloseComparativa');
+        setupModal('btnOpenQuiz', 'modalQuizOverlay', 'btnCloseQuiz');
+
+
+        // --- 9. TEMA CLARO Y OSCURO ---
+        const btnThemeToggle = document.getElementById('btnThemeToggle');
+        let currentTheme = localStorage.getItem('theme') || 'light';
+
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeIcon();
+
+        btnThemeToggle.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            updateThemeIcon();
+            drawConnections(); // Redibuja conectores por el cambio de variables CSS de color
+        });
+
+        function updateThemeIcon() {
+            if (currentTheme === 'light') {
+                btnThemeToggle.innerHTML = '<i class="fa-solid fa-moon"></i>';
+            } else {
+                btnThemeToggle.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            }
+        }
+
+
+        // --- 10. LÓGICA INTERACTIVA DEL QUIZ DE AUTOEVALUACIÓN ---
+        const quizIntro = document.getElementById('quizIntro');
+        const quizCard = document.getElementById('quizCard');
+        const quizResultsCard = document.getElementById('quizResultsCard');
+        const btnStartQuiz = document.getElementById('btnStartQuiz');
+        const quizQuestionText = document.getElementById('quizQuestionText');
+        const quizOptionsContainer = document.getElementById('quizOptionsContainer');
+        const quizFeedback = document.getElementById('quizFeedback');
+        const btnNextQuestion = document.getElementById('btnNextQuestion');
+        const quizProgressText = document.getElementById('quizProgressText');
+        const quizProgressFill = document.getElementById('quizProgressFill');
+        const quizScoreText = document.getElementById('quizScoreText');
+        
+        let quizCurrentIndex = 0;
+        let quizScore = 0;
+        let studentName = "";
+        let hasAnswered = false;
+
+        btnStartQuiz.addEventListener('click', () => {
+            const nameInput = document.getElementById('studentNameInput').value.trim();
+            if (nameInput === "") {
+                alert("Por favor, ingresa tu nombre completo para comenzar y emitir tu constancia.");
+                return;
+            }
+            studentName = nameInput;
+            quizIntro.style.display = "none";
+            quizCard.classList.add('active');
+            loadQuizQuestion();
+        });
+
+        function loadQuizQuestion() {
+            hasAnswered = false;
+            btnNextQuestion.style.display = "none";
+            quizFeedback.style.display = "none";
+            quizOptionsContainer.innerHTML = "";
+
+            const questionData = quizQuestions[quizCurrentIndex];
+
+            // Actualizar interfaz y barra de progreso
+            quizQuestionText.textContent = questionData.q;
+            quizProgressText.textContent = `Pregunta ${quizCurrentIndex + 1} de ${quizQuestions.length}`;
+            
+            const progressPercent = ((quizCurrentIndex) / quizQuestions.length) * 100;
+            quizProgressFill.style.width = `${progressPercent}%`;
+            quizScoreText.textContent = `Puntos: ${quizScore}`;
+
+            // Renderizar opciones
+            questionData.o.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => selectQuizOption(idx, btn));
+                quizOptionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(selectedIndex, buttonEl) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+
+            const questionData = quizQuestions[quizCurrentIndex];
+            const correctIndex = questionData.c;
+
+            // Bloquear otras opciones y pintar resultados
+            const allOptions = quizOptionsContainer.querySelectorAll('.quiz-option');
+            allOptions.forEach((btn, idx) => {
+                btn.style.cursor = "default";
+                if (idx === correctIndex) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIndex) {
+                    btn.classList.add('incorrect');
+                }
+            });
+
+            // Mostrar Feedback
+            quizFeedback.style.display = "block";
+            if (selectedIndex === correctIndex) {
+                quizScore += 20; // 20 puntos por acierto, total 100
+                quizScoreText.textContent = `Puntos: ${quizScore}`;
+                quizFeedback.className = "quiz-feedback correct";
+                quizFeedback.innerHTML = `<strong>¡Respuesta Correcta!</strong><br>${questionData.feedback}`;
+            } else {
+                quizFeedback.className = "quiz-feedback incorrect";
+                quizFeedback.innerHTML = `<strong>Respuesta Incorrecta.</strong> La respuesta correcta era: "${questionData.o[correctIndex]}".<br>${questionData.feedback}`;
+            }
+
+            // Mostrar botón siguiente
+            btnNextQuestion.style.display = "block";
+        }
+
+        btnNextQuestion.addEventListener('click', () => {
+            quizCurrentIndex++;
+            if (quizCurrentIndex < quizQuestions.length) {
+                loadQuizQuestion();
+            } else {
+                showQuizResults();
+            }
+        });
+
+        function showQuizResults() {
+            quizCard.classList.remove('active');
+            quizResultsCard.classList.add('active');
+
+            // Actualizar barra final al 100%
+            quizProgressFill.style.width = "100%";
+
+            const quizResultsScoreText = document.getElementById('quizResultsScoreText');
+            const certificateBox = document.getElementById('certificateBox');
+            const certStudentName = document.getElementById('certStudentName');
+            const btnPrintCertificate = document.getElementById('btnPrintCertificate');
+            const certDate = document.getElementById('certDate');
+
+            quizResultsScoreText.innerHTML = `Obtuviste <strong>${quizScore} de 100</strong> puntos posibles.`;
+
+            // Si aprobó (más de 60 puntos), generar constancia
+            if (quizScore >= 60) {
+                document.getElementById('quizResultsTitle').textContent = "¡Felicidades, Aprobaste!";
+                certificateBox.style.display = "block";
+                certStudentName.textContent = studentName;
+                
+                // Formatear Fecha Actual
+                const dateObj = new Date();
+                const formatDay = String(dateObj.getDate()).padStart(2, '0');
+                const formatMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const formatYear = dateObj.getFullYear();
+                certDate.textContent = `${formatDay}/${formatMonth}/${formatYear}`;
+                
+                btnPrintCertificate.style.display = "inline-block";
+            } else {
+                document.getElementById('quizResultsTitle').textContent = "Sigue Practicando";
+                certificateBox.style.display = "none";
+                btnPrintCertificate.style.display = "none";
+            }
+        }
+
+        // Reintentar quiz
+        document.getElementById('btnRestartQuiz').addEventListener('click', () => {
+            quizCurrentIndex = 0;
+            quizScore = 0;
+            quizResultsCard.classList.remove('active');
+            quizIntro.style.display = "block";
+        });
+
+        // Imprimir Certificado
+        document.getElementById('btnPrintCertificate').addEventListener('click', () => {
+            window.print();
+        });
+
+
+        // --- 11. INICIALIZACIÓN ---
+        window.addEventListener('load', () => {
+            // Esperar un momento a que cargue el layout de flex/grid para obtener correctas posiciones del DOM
+            setTimeout(() => {
+                updateCanvasTransform();
+            }, 300);
+        });
+
+        window.addEventListener('resize', () => {
+            drawConnections();
+        });
+    </script>
+</body>
+</html>
