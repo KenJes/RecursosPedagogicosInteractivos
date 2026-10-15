@@ -1,0 +1,2379 @@
+```html
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ERP Consultant: Mapa de Riesgos (Simulación 12 meses)</title>
+    <style>
+        :root {
+            --bg: #0b1220;
+            --panel: #111b2e;
+            --panel2: #0f1728;
+            --card: #0f203a;
+            --line: rgba(255, 255, 255, .14);
+            --muted: rgba(255, 255, 255, .68);
+            --text: rgba(255, 255, 255, .92);
+            --good: #2be4a7;
+            --warn: #ffd166;
+            --bad: #ff5c77;
+            --info: #5cc8ff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .app {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top KPI bar */
+        .topbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 12px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0));
+            border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 260px;
+        }
+
+        .brand .title {
+            font-weight: 700;
+            letter-spacing: .2px;
+            font-size: 14px;
+            line-height: 1.1;
+        }
+
+        .brand .sub {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .03);
+            font-size: 12px;
+            color: var(--muted);
+            user-select: none;
+        }
+
+        .kpis {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            flex: 1;
+        }
+
+        .kpi {
+            flex: 1;
+            min-width: 140px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 10px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+        }
+
+        .kpi .label {
+            font-size: 11px;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .kpi .value {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 4px;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+
+        .kpi .value small {
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .kpi .bar {
+            height: 6px;
+            margin-top: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .08);
+            overflow: hidden;
+        }
+
+        .kpi .bar>i {
+            display: block;
+            height: 100%;
+            width: 50%;
+            background: rgba(255, 255, 255, .25);
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--line);
+            color: var(--text);
+            border-radius: 10px;
+            padding: 8px 10px;
+            cursor: pointer;
+            transition: transform .06s ease, background .2s ease;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, .07);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn.primary {
+            background: rgba(43, 228, 167, .12);
+            border-color: rgba(43, 228, 167, .35);
+        }
+
+        .btn.danger {
+            background: rgba(255, 92, 119, .10);
+            border-color: rgba(255, 92, 119, .35);
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+
+        /* Main split */
+        .main {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 1.15fr .85fr;
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .left,
+        .right {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+            box-shadow: var(--shadow);
+            min-height: 0;
+        }
+
+        /* Risk map */
+        .mapHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 10px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(0, 0, 0, .12);
+        }
+
+        .mapHeader .hint {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            user-select: none;
+        }
+
+        .legend {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, .25);
+            margin-right: 6px;
+        }
+
+        .mapWrap {
+            position: relative;
+            height: 100%;
+            min-height: 0;
+        }
+
+        #riskMap {
+            width: 100%;
+            height: calc(100% - 0px);
+            display: block;
+            background: radial-gradient(900px 500px at 20% 15%, rgba(92, 200, 255, .10), transparent 60%),
+                radial-gradient(700px 400px at 80% 70%, rgba(43, 228, 167, .08), transparent 62%),
+                linear-gradient(180deg, rgba(0, 0, 0, .12), rgba(0, 0, 0, .18));
+        }
+
+        .nodePopover {
+            position: absolute;
+            min-width: 220px;
+            background: rgba(15, 23, 40, .96);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 10px;
+            z-index: 5;
+            backdrop-filter: blur(6px);
+        }
+
+        .nodePopover .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nodePopover .title {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .nodePopover .mini {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .nodePopover .pill {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 2px 8px;
+            font-size: 11px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .03);
+        }
+
+        .sevRow {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .sevBtn {
+            flex: 1;
+            border-radius: 10px;
+            padding: 8px 8px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .sevBtn:hover {
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .sevBtn[data-sev="1"] {
+            border-color: rgba(92, 200, 255, .35);
+        }
+
+        .sevBtn[data-sev="2"] {
+            border-color: rgba(255, 209, 102, .35);
+        }
+
+        .sevBtn[data-sev="3"] {
+            border-color: rgba(255, 92, 119, .35);
+        }
+
+        .typeRow {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .typeBtn {
+            border-radius: 999px;
+            padding: 5px 8px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+            cursor: pointer;
+            font-size: 11px;
+            color: var(--muted);
+            user-select: none;
+        }
+
+        .typeBtn.active {
+            background: rgba(255, 255, 255, .07);
+            color: var(--text);
+        }
+
+        .nodePopover .footer {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        /* Right: modules */
+        .rightHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 10px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(0, 0, 0, .12);
+        }
+
+        .rightHeader .hTitle {
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .rightHeader .hSub {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .modules {
+            height: 100%;
+            min-height: 0;
+            overflow: auto;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .mod {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .02));
+            padding: 10px;
+        }
+
+        .modTop {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .modName {
+            font-weight: 800;
+            font-size: 13px;
+            letter-spacing: .2px;
+        }
+
+        .modMeta {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 3px 8px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+            font-size: 11px;
+            color: var(--muted);
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .status i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .impact {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .tag {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+            user-select: none;
+        }
+
+        .modActions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .tiny {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* Bottom timeline */
+        .bottombar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 12px;
+            border-top: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .04));
+        }
+
+        .timeline {
+            flex: 1;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .mseg {
+            flex: 1;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .10);
+            overflow: hidden;
+        }
+
+        .mseg.done {
+            background: rgba(43, 228, 167, .18);
+            border-color: rgba(43, 228, 167, .20);
+        }
+
+        .mseg.current {
+            background: rgba(255, 209, 102, .18);
+            border-color: rgba(255, 209, 102, .20);
+        }
+
+        .log {
+            width: 420px;
+            max-width: 42vw;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .03);
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 44px;
+        }
+
+        .logLine {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logLine b {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        /* Modal / Intro chat */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .62);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            padding: 16px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modalCard {
+            width: min(920px, 96vw);
+            border-radius: 16px;
+            border: 1px solid var(--line);
+            background: linear-gradient(180deg, rgba(17, 27, 46, .98), rgba(15, 23, 40, .98));
+            box-shadow: 0 22px 60px rgba(0, 0, 0, .55);
+            overflow: hidden;
+        }
+
+        .modalHead {
+            padding: 12px 12px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, .16);
+        }
+
+        .modalHead .mhTitle {
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .modalBody {
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
+            gap: 12px;
+        }
+
+        .chat {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .03);
+            padding: 10px;
+            min-height: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: auto;
+        }
+
+        .bubble {
+            max-width: 86%;
+            padding: 8px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .04);
+            color: var(--text);
+            font-size: 12.5px;
+            line-height: 1.28;
+        }
+
+        .bubble.ceo {
+            align-self: flex-start;
+            border-top-left-radius: 6px;
+        }
+
+        .bubble.you {
+            align-self: flex-end;
+            background: rgba(92, 200, 255, .08);
+            border-color: rgba(92, 200, 255, .22);
+            border-top-right-radius: 6px;
+        }
+
+        .scenario {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .03);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .scenario .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .scenario .big {
+            font-weight: 900;
+            font-size: 15px;
+        }
+
+        .scenario .small {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .icons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ico {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+
+        .modalFoot {
+            padding: 12px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, .12);
+        }
+
+        /* End report */
+        .report {
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 12px;
+        }
+
+        .reportCard {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .03);
+            padding: 10px;
+        }
+
+        .scoreBig {
+            font-size: 34px;
+            font-weight: 950;
+            letter-spacing: -.5px;
+        }
+
+        .scoreSub {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .breakdown {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .brow {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .brow b {
+            color: var(--text);
+        }
+
+        .reportBtns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        /* Scrollbar subtle */
+        .modules::-webkit-scrollbar,
+        .chat::-webkit-scrollbar {
+            height: 10px;
+            width: 10px;
+        }
+
+        .modules::-webkit-scrollbar-thumb,
+        .chat::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .12);
+            border-radius: 999px;
+            border: 2px solid rgba(0, 0, 0, 0);
+            background-clip: padding-box;
+        }
+
+        /* Responsive */
+        @media (max-width: 980px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+
+            .log {
+                width: 100%;
+                max-width: none;
+            }
+
+            .modalBody {
+                grid-template-columns: 1fr;
+            }
+
+            .report {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="topbar">
+            <div class="brand">
+                <div class="title" id="companyTitle">ERP Consultant</div>
+                <div class="sub">
+                    <span class="chip" id="industryChip">Industria</span>
+                    <span class="chip" id="sizeChip">Tamaño</span>
+                    <span class="chip" id="painsChip" title="Señales clave (pistas)">Señales</span>
+                </div>
+            </div>
+
+            <div class="kpis">
+                <div class="kpi">
+                    <div class="label"><span>Mes</span><span id="monthLabel">1 / 12</span></div>
+                    <div class="value"><span id="monthName">Ene</span><small id="yearLabel">Año 1</small></div>
+                    <div class="bar"><i id="monthBar"></i></div>
+                </div>
+                <div class="kpi">
+                    <div class="label"><span>Caja</span><span id="cashDelta"></span></div>
+                    <div class="value"><span id="cashValue">$0</span><small>MXN</small></div>
+                    <div class="bar"><i id="cashBar"></i></div>
+                </div>
+                <div class="kpi">
+                    <div class="label"><span>Utilidad mensual</span><span id="profitHint"></span></div>
+                    <div class="value"><span id="profitValue">$0</span><small>MXN</small></div>
+                    <div class="bar"><i id="profitBar"></i></div>
+                </div>
+                <div class="kpi">
+                    <div class="label"><span>Riesgo</span><span id="riskHint"></span></div>
+                    <div class="value"><span id="riskValue">0</span><small>/100</small></div>
+                    <div class="bar"><i id="riskBar"></i></div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn" id="btnNewCase" title="Genera un caso nuevo (procedural)">Nuevo caso</button>
+                <button class="btn" id="btnReport" title="Ver reporte (al finalizar o si quiebras)"
+                    disabled>Reporte</button>
+                <button class="btn danger" id="btnReset" title="Reinicia el caso actual">Reiniciar</button>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="left">
+                <div class="mapHeader">
+                    <div class="hint">
+                        <span class="chip" title="Clic en un área para marcar un indicador">Mapa de Riesgos</span>
+                        <span class="chip" title="Objetivo: 12 meses sin quiebra, ganancia y control de riesgos">12
+                            meses</span>
+                        <span class="chip" id="objectiveChip">Objetivo</span>
+                    </div>
+                    <div class="legend" aria-label="Leyenda">
+                        <span class="chip"><span class="dot" style="background:var(--info)"></span>Sev 1</span>
+                        <span class="chip"><span class="dot" style="background:var(--warn)"></span>Sev 2</span>
+                        <span class="chip"><span class="dot" style="background:var(--bad)"></span>Sev 3</span>
+                        <span class="chip" title="Estado del módulo (punto en cada área)"><span class="dot"
+                                style="background:var(--good)"></span>ERP activo</span>
+                    </div>
+                </div>
+                <div class="mapWrap">
+                    <svg id="riskMap" viewBox="0 0 1000 640" role="img" aria-label="Mapa técnico de procesos"></svg>
+                    <div id="nodePopover" class="nodePopover" style="display:none" role="dialog" aria-modal="false">
+                    </div>
+                </div>
+            </div>
+
+            <div class="right">
+                <div class="rightHeader">
+                    <div>
+                        <div class="hTitle">Módulos ERP</div>
+                        <div class="hSub">Costo vs inversión (decisión crítica)</div>
+                    </div>
+                    <div class="chip" id="monthlyBurn" title="Costos mensuales activos (suscripción/operación)">Mensual:
+                        $0</div>
+                </div>
+                <div class="modules" id="modules"></div>
+            </div>
+        </div>
+
+        <div class="bottombar">
+            <div class="timeline" id="timeline" aria-label="Progreso de meses"></div>
+            <div class="log" aria-label="Últimos eventos">
+                <div class="logLine"><b id="eventTitle">Evento</b><span id="eventTag">—</span></div>
+                <div class="logLine" id="eventLine1">—</div>
+                <div class="logLine" id="eventLine2">—</div>
+            </div>
+            <button class="btn primary" id="btnCloseMonth" title="Cierra el mes y simula resultados" disabled>Cerrar
+                mes</button>
+        </div>
+    </div>
+
+    <!-- Intro modal -->
+    <div class="modal" id="introModal" aria-hidden="true">
+        <div class="modalCard">
+            <div class="modalHead">
+                <div class="mhTitle">Briefing del CEO</div>
+                <div class="chip" id="seedChip" title="Semilla del caso (para reproducibilidad interna)">Seed</div>
+            </div>
+
+            <div class="modalBody">
+                <div class="chat" id="chat"></div>
+                <div class="scenario">
+                    <div class="row">
+                        <div>
+                            <div class="big" id="scCompany">—</div>
+                            <div class="small" id="scIndustry">—</div>
+                        </div>
+                        <div class="chip" id="scCash">Caja inicial</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="small">Señales (pistas)</div>
+                        <div class="small">Impacto si faltan módulos</div>
+                    </div>
+
+                    <div class="icons" id="scPains"></div>
+
+                    <div class="small">
+                        Indicaciones: implementa módulos (costo) para reducir pérdidas y riesgos. Marca indicadores en
+                        el mapa.
+                    </div>
+
+                    <div class="row">
+                        <span class="chip" id="scConstraint">Texto mínimo · visual primero</span>
+                        <span class="chip" id="scDuration">Duración: 12 meses</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modalFoot">
+                <button class="btn" id="btnRegenerateBrief" title="Genera otro briefing (mismo caso)">Rehacer
+                    briefing</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" id="btnCancelIntro" title="Cerrar (mantiene el caso)">Cerrar</button>
+                    <button class="btn primary" id="btnStart" title="Empieza la simulación">Aceptar desafío</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report modal -->
+    <div class="modal" id="reportModal" aria-hidden="true">
+        <div class="modalCard">
+            <div class="modalHead">
+                <div class="mhTitle">Reporte final · Mapa de Riesgos</div>
+                <button class="btn" id="btnCloseReport">Cerrar</button>
+            </div>
+
+            <div class="report">
+                <div class="reportCard">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                        <div>
+                            <div class="chip" id="rpCompany">—</div>
+                            <div class="chip" id="rpOutcome">—</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="scoreBig" id="rpScore">0</div>
+                            <div class="scoreSub">Puntaje (0–100)</div>
+                        </div>
+                    </div>
+
+                    <div class="breakdown" id="rpBreakdown"></div>
+
+                    <div class="reportBtns">
+                        <button class="btn" id="btnExportPNG" title="Descarga una imagen del mapa (PNG)">Exportar mapa
+                            (PNG)</button>
+                        <button class="btn" id="btnExportJSON" title="Descarga decisiones y pines (JSON)">Exportar datos
+                            (JSON)</button>
+                        <button class="btn" id="btnNewFromReport" title="Inicia un caso nuevo">Nuevo caso</button>
+                    </div>
+                </div>
+
+                <div class="reportCard">
+                    <div class="chip" style="margin-bottom:8px;">Vista del mapa (con pines)</div>
+                    <div style="border:1px solid var(--line); border-radius:14px; overflow:hidden;">
+                        <svg id="reportMap" viewBox="0 0 1000 640"
+                            style="width:100%; height:auto; display:block; background:transparent;"></svg>
+                    </div>
+                    <div class="tiny" style="margin-top:8px;">
+                        Nota: el puntaje considera (a) resultado financiero, (b) control de riesgo y (c) calidad del
+                        mapa (pines en zonas de mayor riesgo).
+                    </div>
+                </div>
+            </div>
+
+            <div class="modalFoot">
+                <span class="small" style="color:var(--muted); font-size:12px;">
+                    Evidencia esperada: equilibrio entre gasto (módulos) e inversión (ganancias + reducción de
+                    pérdidas).
+                </span>
+                <button class="btn primary" id="btnCloseReport2">Listo</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        "use strict";
+
+        /* ============================================================
+           ERP Consultant: simulación gamificada (12 meses)
+           - Caso procedural (industria, tamaño, dolores, números)
+           - Decisión: instalar módulos con costo vs beneficio
+           - Mapa de riesgos: el alumno coloca indicadores en imagen técnica (SVG)
+           - Texto mínimo: UI orientada a iconos + números + tooltips
+           ============================================================ */
+
+        /* ---------- Utilidades ---------- */
+
+        function mulberry32(seed) {
+            return function () {
+                let t = seed += 0x6D2B79F5;
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+        function rndInt(rng, min, max) { return Math.floor(rng() * (max - min + 1)) + min; }
+        function pick(rng, arr) { return arr[Math.floor(rng() * arr.length)]; }
+        function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+        function fmtMoney(n) {
+            const sign = n < 0 ? "-" : "";
+            const abs = Math.abs(Math.round(n));
+            return sign + "$" + abs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        /* ---------- Datos (módulos, industrias, eventos) ---------- */
+
+        const RISK_TYPES = [
+            { id: "operacion", label: "Operación", color: "var(--info)" },
+            { id: "finanzas", label: "Finanzas", color: "var(--warn)" },
+            { id: "calidad", label: "Calidad", color: "var(--bad)" },
+            { id: "cumplimiento", label: "Cumplimiento", color: "var(--warn)" },
+            { id: "cliente", label: "Cliente", color: "var(--info)" },
+        ];
+
+        const MODULES = [
+            {
+                id: "sales", name: "Ventas / CRM",
+                setupBase: 90000, monthlyBase: 9000,
+                effect: { revenue: +0.05, overhead: -0.01, risk: { cliente: -18, operacion: -4 } },
+                hint: "Leads, pipeline, servicio"
+            },
+            {
+                id: "procurement", name: "Compras",
+                setupBase: 70000, monthlyBase: 7000,
+                effect: { cogs: -0.03, overhead: -0.005, risk: { operacion: -10, finanzas: -6 } },
+                hint: "Proveedores, PO, contratos"
+            },
+            {
+                id: "inventory", name: "Inventario / Almacén",
+                setupBase: 85000, monthlyBase: 8500,
+                effect: { revenue: +0.02, cogs: -0.01, overhead: -0.01, risk: { operacion: -18, cliente: -6 } },
+                hint: "Stock, trazabilidad, picking"
+            },
+            {
+                id: "production", name: "Producción / MRP",
+                setupBase: 120000, monthlyBase: 12000,
+                effect: { revenue: +0.02, cogs: -0.02, overhead: -0.005, risk: { operacion: -16, calidad: -6 } },
+                hint: "Planificación, órdenes, BOM"
+            },
+            {
+                id: "quality", name: "Control de Calidad",
+                setupBase: 80000, monthlyBase: 8000,
+                effect: { revenue: +0.01, cogs: -0.01, overhead: +0.002, risk: { calidad: -22, cumplimiento: -6 } },
+                hint: "No conformidades, auditorías"
+            },
+            {
+                id: "finance", name: "Finanzas / Contabilidad",
+                setupBase: 95000, monthlyBase: 9500,
+                effect: { overhead: -0.015, risk: { finanzas: -22, cumplimiento: -8 } },
+                hint: "Cierres, cobros, pagos"
+            },
+            {
+                id: "hr", name: "RRHH / Nómina",
+                setupBase: 60000, monthlyBase: 6500,
+                effect: { overhead: -0.01, risk: { operacion: -6, finanzas: -4 } },
+                hint: "Turnos, nómina, rotación"
+            },
+            {
+                id: "maintenance", name: "Mantenimiento",
+                setupBase: 65000, monthlyBase: 6500,
+                effect: { cogs: -0.008, overhead: -0.004, risk: { operacion: -10, calidad: -5 } },
+                hint: "Preventivo, activos, paros"
+            },
+            {
+                id: "bi", name: "BI / Analítica",
+                setupBase: 75000, monthlyBase: 7500,
+                effect: { revenue: +0.01, overhead: -0.004, risk: { finanzas: -6, operacion: -6, cliente: -4 } },
+                hint: "KPIs, alertas, pronósticos"
+            }
+        ];
+
+        // Áreas (nodos) del mapa técnico: cada área se asocia a un módulo principal.
+        const MAP_NODES = [
+            { id: "salesArea", label: "Ventas", x: 120, y: 110, w: 210, h: 90, module: "sales", type: "cliente" },
+            { id: "crmService", label: "Servicio", x: 120, y: 230, w: 210, h: 80, module: "sales", type: "cliente" },
+
+            { id: "procArea", label: "Compras", x: 410, y: 90, w: 210, h: 80, module: "procurement", type: "operacion" },
+            { id: "invArea", label: "Almacén", x: 410, y: 190, w: 210, h: 90, module: "inventory", type: "operacion" },
+            { id: "prodArea", label: "Producción", x: 690, y: 150, w: 220, h: 110, module: "production", type: "operacion" },
+            { id: "qualArea", label: "Calidad", x: 690, y: 290, w: 220, h: 90, module: "quality", type: "calidad" },
+            { id: "maintArea", label: "Mantenimiento", x: 690, y: 410, w: 220, h: 90, module: "maintenance", type: "operacion" },
+
+            { id: "finArea", label: "Finanzas", x: 410, y: 340, w: 210, h: 90, module: "finance", type: "finanzas" },
+            { id: "hrArea", label: "RRHH", x: 120, y: 360, w: 210, h: 80, module: "hr", type: "finanzas" },
+            { id: "biArea", label: "BI", x: 410, y: 470, w: 210, h: 90, module: "bi", type: "finanzas" },
+        ];
+
+        const INDUSTRIES = [
+            { name: "Alimentos y bebidas", pains: ["calidad", "inventario", "cumplimiento"], seasonality: 0.08 },
+            { name: "Retail y distribución", pains: ["inventario", "ventas", "finanzas"], seasonality: 0.10 },
+            { name: "E-commerce", pains: ["ventas", "inventario", "finanzas"], seasonality: 0.12 },
+            { name: "Autopartes", pains: ["produccion", "mantenimiento", "calidad"], seasonality: 0.06 },
+            { name: "Logística", pains: ["inventario", "compras", "finanzas"], seasonality: 0.07 },
+            { name: "Farmacéutica (insumos)", pains: ["cumplimiento", "calidad", "inventario"], seasonality: 0.05 },
+            { name: "Servicios B2B", pains: ["ventas", "finanzas", "bi"], seasonality: 0.04 },
+        ];
+
+        const COMPANY_SIZES = [
+            { name: "Pequeña", scale: 0.8 },
+            { name: "Mediana", scale: 1.0 },
+            { name: "Grande", scale: 1.25 },
+        ];
+
+        const CEO_NAMES = ["Valeria", "Diego", "Lucía", "Mateo", "Mariana", "Andrés", "Fernanda", "Iván", "Sofía", "Javier"];
+        const COMPANY_PREFIX = ["Nova", "Orbis", "Altia", "Penta", "Helix", "Cima", "Lumen", "Faro", "Sigma", "Delta"];
+        const COMPANY_SUFFIX = ["Foods", "Logistics", "Parts", "Retail", "Labs", "Supply", "Systems", "Trade", "Works", "Group"];
+
+        const EVENT_POOL = [
+            // name, type, base severity (0..1), affects {revenueDelta,cogsDelta,overheadDelta,riskBump}, related modules
+            { name: "Pedido grande (oportunidad)", type: "cliente", sev: 0.55, related: ["sales", "inventory", "finance"], delta: { rev: +0.10, cogs: +0.06, oh: +0.02 }, risk: +4 },
+            { name: "Quiebre de stock", type: "operacion", sev: 0.65, related: ["inventory", "procurement"], delta: { rev: -0.08, cogs: +0.02, oh: +0.01 }, risk: +10 },
+            { name: "Retraso de proveedor", type: "operacion", sev: 0.55, related: ["procurement", "inventory", "production"], delta: { rev: -0.05, cogs: +0.01, oh: +0.01 }, risk: +8 },
+            { name: "Paro de máquina", type: "operacion", sev: 0.60, related: ["maintenance", "production"], delta: { rev: -0.06, cogs: +0.015, oh: +0.015 }, risk: +9 },
+            { name: "Reclamo / devoluciones", type: "calidad", sev: 0.55, related: ["quality", "sales"], delta: { rev: -0.04, cogs: +0.02, oh: +0.01 }, risk: +10 },
+            { name: "Auditoría / cumplimiento", type: "cumplimiento", sev: 0.50, related: ["finance", "quality"], delta: { rev: 0, cogs: 0, oh: +0.02 }, risk: +12 },
+            { name: "Cierre contable lento", type: "finanzas", sev: 0.45, related: ["finance", "bi"], delta: { rev: -0.01, cogs: 0, oh: +0.03 }, risk: +8 },
+            { name: "Alta rotación", type: "finanzas", sev: 0.45, related: ["hr"], delta: { rev: -0.01, cogs: +0.005, oh: +0.02 }, risk: +6 },
+            { name: "Demanda estacional", type: "cliente", sev: 0.50, related: ["sales", "inventory", "bi"], delta: { rev: +0.06, cogs: +0.03, oh: +0.01 }, risk: +3 },
+        ];
+
+        /* ---------- Estado del juego ---------- */
+
+        const state = {
+            seed: 0,
+            rng: null,
+
+            // Scenario
+            companyName: "",
+            ceoName: "",
+            industry: null,
+            size: null,
+            pains: [],               // IDs de "señales"
+            needs: {},               // peso por módulo (0..1)
+            base: { revenue: 0, cogs: 0, overhead: 0 },
+            cashStart: 0,
+
+            // Progress
+            month: 1,                // 1..12
+            cash: 0,
+            lastCash: 0,
+            lastProfit: 0,
+            riskIndex: 0,            // 0..100
+
+            // Modules status
+            modules: {},             // {moduleId: {status:'none'|'impl'|'live', startedMonth:int, liveMonth:int, adoption:0..1}}
+            moduleCosts: {},         // cache of costs with size scale
+
+            // Risk map pins
+            pins: [],                // {nodeId, typeId, severity, monthPlaced}
+
+            // Risk snapshot for scoring (last computed per node)
+            nodeRisk: {},            // {nodeId: 0..100}
+
+            // log
+            lastEvent: null,
+            logLines: ["—", "—"],
+
+            // outcome
+            finished: false,
+            bankrupt: false,
+        };
+
+        /* ---------- Elementos DOM ---------- */
+
+        const el = {
+            companyTitle: document.getElementById("companyTitle"),
+            industryChip: document.getElementById("industryChip"),
+            sizeChip: document.getElementById("sizeChip"),
+            painsChip: document.getElementById("painsChip"),
+
+            monthLabel: document.getElementById("monthLabel"),
+            monthName: document.getElementById("monthName"),
+            yearLabel: document.getElementById("yearLabel"),
+            monthBar: document.getElementById("monthBar"),
+
+            cashValue: document.getElementById("cashValue"),
+            cashDelta: document.getElementById("cashDelta"),
+            cashBar: document.getElementById("cashBar"),
+
+            profitValue: document.getElementById("profitValue"),
+            profitHint: document.getElementById("profitHint"),
+            profitBar: document.getElementById("profitBar"),
+
+            riskValue: document.getElementById("riskValue"),
+            riskHint: document.getElementById("riskHint"),
+            riskBar: document.getElementById("riskBar"),
+
+            monthlyBurn: document.getElementById("monthlyBurn"),
+
+            timeline: document.getElementById("timeline"),
+
+            eventTitle: document.getElementById("eventTitle"),
+            eventTag: document.getElementById("eventTag"),
+            eventLine1: document.getElementById("eventLine1"),
+            eventLine2: document.getElementById("eventLine2"),
+
+            btnCloseMonth: document.getElementById("btnCloseMonth"),
+            btnReset: document.getElementById("btnReset"),
+            btnNewCase: document.getElementById("btnNewCase"),
+            btnReport: document.getElementById("btnReport"),
+
+            riskMap: document.getElementById("riskMap"),
+            reportMap: document.getElementById("reportMap"),
+            pop: document.getElementById("nodePopover"),
+
+            modules: document.getElementById("modules"),
+            objectiveChip: document.getElementById("objectiveChip"),
+
+            // Intro modal
+            introModal: document.getElementById("introModal"),
+            seedChip: document.getElementById("seedChip"),
+            chat: document.getElementById("chat"),
+            scCompany: document.getElementById("scCompany"),
+            scIndustry: document.getElementById("scIndustry"),
+            scCash: document.getElementById("scCash"),
+            scPains: document.getElementById("scPains"),
+            btnStart: document.getElementById("btnStart"),
+            btnCancelIntro: document.getElementById("btnCancelIntro"),
+            btnRegenerateBrief: document.getElementById("btnRegenerateBrief"),
+
+            // Report
+            reportModal: document.getElementById("reportModal"),
+            btnCloseReport: document.getElementById("btnCloseReport"),
+            btnCloseReport2: document.getElementById("btnCloseReport2"),
+            rpCompany: document.getElementById("rpCompany"),
+            rpOutcome: document.getElementById("rpOutcome"),
+            rpScore: document.getElementById("rpScore"),
+            rpBreakdown: document.getElementById("rpBreakdown"),
+            btnExportPNG: document.getElementById("btnExportPNG"),
+            btnExportJSON: document.getElementById("btnExportJSON"),
+            btnNewFromReport: document.getElementById("btnNewFromReport"),
+        };
+
+        /* ---------- SVG helpers ---------- */
+
+        function svgEl(tag, attrs = {}, children = []) {
+            const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+            for (const [k, v] of Object.entries(attrs)) {
+                if (k === "textContent") n.textContent = v;
+                else n.setAttribute(k, v);
+            }
+            for (const c of children) n.appendChild(c);
+            return n;
+        }
+
+        /* ---------- Caso procedural ---------- */
+
+        function generateScenario(seed) {
+            state.seed = seed >>> 0;
+            state.rng = mulberry32(state.seed);
+            const rng = state.rng;
+
+            state.ceoName = pick(rng, CEO_NAMES);
+            state.companyName = pick(rng, COMPANY_PREFIX) + " " + pick(rng, COMPANY_SUFFIX);
+            state.industry = pick(rng, INDUSTRIES);
+            state.size = pick(rng, COMPANY_SIZES);
+
+            // Señales (pains) basadas en industria + ruido procedural
+            const basePains = [...state.industry.pains];
+            const extra = pick(rng, ["ventas", "compras", "inventario", "produccion", "calidad", "finanzas", "rrhh", "mantenimiento", "bi", "cumplimiento"]);
+            const translatePain = (p) => {
+                const map = {
+                    ventas: "ventas", compras: "compras", inventario: "inventario", produccion: "produccion",
+                    calidad: "calidad", finanzas: "finanzas", rrhh: "rrhh", mantenimiento: "mantenimiento", bi: "bi", cumplimiento: "cumplimiento",
+                    operacion: "operacion", cliente: "cliente"
+                };
+                return map[p] || p;
+            };
+
+            // Convertir a IDs de "señal" (pistas) simple
+            const signalSet = new Set(basePains.map(translatePain));
+            signalSet.add(translatePain(extra));
+
+            // Normalizar señales a un set pequeño (3–5)
+            const allSignals = Array.from(signalSet);
+            while (allSignals.length > 5) allSignals.splice(rndInt(rng, 0, allSignals.length - 1), 1);
+            while (allSignals.length < 3) allSignals.push(pick(rng, ["inventario", "calidad", "finanzas", "operacion", "cliente", "cumplimiento"]));
+
+            state.pains = allSignals;
+
+            // Necesidades por módulo (0..1): influenciadas por señales
+            const needs = {};
+            for (const m of MODULES) needs[m.id] = 0.25 + rng() * 0.25; // base 0.25–0.50
+            // Aumentar pesos según señales (heurística)
+            const boost = (moduleId, amt) => needs[moduleId] = clamp(needs[moduleId] + amt, 0.1, 1.0);
+
+            const mapSignalToBoost = {
+                inventario: () => { boost("inventory", 0.35); boost("procurement", 0.15); },
+                calidad: () => { boost("quality", 0.40); boost("production", 0.15); },
+                finanzas: () => { boost("finance", 0.40); boost("bi", 0.15); },
+                ventas: () => { boost("sales", 0.40); },
+                compras: () => { boost("procurement", 0.35); },
+                produccion: () => { boost("production", 0.35); boost("maintenance", 0.15); },
+                rrhh: () => { boost("hr", 0.35); },
+                mantenimiento: () => { boost("maintenance", 0.35); },
+                bi: () => { boost("bi", 0.35); },
+                cumplimiento: () => { boost("finance", 0.20); boost("quality", 0.20); },
+                operacion: () => { boost("inventory", 0.20); boost("production", 0.20); },
+                cliente: () => { boost("sales", 0.20); boost("inventory", 0.15); },
+            };
+            for (const s of state.pains) {
+                if (mapSignalToBoost[s]) mapSignalToBoost[s]();
+            }
+            state.needs = needs;
+
+            // Números base (MXN/mes): escalados por tamaño
+            const scale = state.size.scale;
+            const revBase = rndInt(rng, 750000, 1500000) * scale;
+            const margin = lerp(0.26, 0.42, rng()); // margen bruto
+            const cogsBase = revBase * (1 - margin);
+            const overheadBase = revBase * lerp(0.18, 0.28, rng());
+
+            state.base = { revenue: revBase, cogs: cogsBase, overhead: overheadBase };
+
+            // Caja inicial
+            state.cashStart = rndInt(rng, 600000, 1600000) * scale;
+            state.cash = state.cashStart;
+            state.lastCash = state.cashStart;
+            state.lastProfit = 0;
+
+            // Módulos inicialmente "none"
+            state.modules = {};
+            state.moduleCosts = {};
+            for (const m of MODULES) {
+                const setup = Math.round(m.setupBase * scale);
+                const monthly = Math.round(m.monthlyBase * scale);
+                state.moduleCosts[m.id] = { setup, monthly };
+                state.modules[m.id] = { status: "none", startedMonth: 0, liveMonth: 0, adoption: 0 };
+            }
+
+            // Reset resto
+            state.month = 1;
+            state.pins = [];
+            state.nodeRisk = {};
+            state.finished = false;
+            state.bankrupt = false;
+            state.lastEvent = null;
+            state.logLines = ["—", "—"];
+        }
+
+        /* ---------- Briefing del CEO (procedural, texto corto) ---------- */
+
+        function buildIntroChat() {
+            const rng = state.rng;
+
+            const ceo = state.ceoName;
+            const co = state.companyName;
+            const ind = state.industry.name;
+
+            // Frases cortas, con variables
+            const painsShort = describeSignalsShort(state.pains);
+
+            const lines = [
+                { from: "ceo", text: `Soy ${ceo}, CEO de ${co}.` },
+                { from: "ceo", text: `Operamos en ${ind}.` },
+                { from: "ceo", text: `Meta: 12 meses. Evitar quiebra y cerrar con ganancia.` },
+                { from: "ceo", text: `Señales: ${painsShort}.` },
+                { from: "ceo", text: `Tu rol: elegir módulos ERP (costo) para reducir pérdidas (inversión).` },
+                { from: "you", text: `Entendido. Evaluaré riesgos y priorizaré módulos.` },
+            ];
+
+            // Variación ligera (procedural) sin extender texto
+            if (rng() < 0.55) {
+                const add = pick(rng, [
+                    "Hoy perdemos dinero por fricción operativa.",
+                    "Hay fugas por reprocesos y decisiones tardías.",
+                    "La variabilidad nos pega en caja.",
+                    "Los riesgos están subiendo."
+                ]);
+                lines.splice(3, 0, { from: "ceo", text: add });
+            }
+
+            // Render
+            el.chat.innerHTML = "";
+            for (const l of lines) {
+                const b = document.createElement("div");
+                b.className = "bubble " + (l.from === "ceo" ? "ceo" : "you");
+                b.textContent = l.text;
+                el.chat.appendChild(b);
+            }
+            el.chat.scrollTop = el.chat.scrollHeight;
+
+            // Panel resumen
+            el.scCompany.textContent = co;
+            el.scIndustry.textContent = ind + " · " + state.size.name;
+            el.scCash.textContent = "Caja inicial: " + fmtMoney(state.cashStart);
+
+            el.scPains.innerHTML = "";
+            for (const s of state.pains) {
+                el.scPains.appendChild(makePainIcon(s));
+            }
+
+            el.seedChip.textContent = "Seed: " + state.seed;
+        }
+
+        /* ---------- UI icons (señales/pistas) ---------- */
+
+        function makePainIcon(signalId) {
+            const div = document.createElement("div");
+            div.className = "ico";
+            const meta = painMeta(signalId);
+            div.title = meta.title;
+            div.innerHTML = meta.svg;
+            return div;
+        }
+
+        function painMeta(id) {
+            // Inline SVGs muy simples (sin assets externos)
+            const base = (title, svg) => ({ title, svg });
+            switch (id) {
+                case "inventario":
+                    return base("Inventario: quiebres / exceso", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="5" width="18" height="14" rx="2" stroke="rgba(255,255,255,.8)"/>
+          <path d="M3 9h18" stroke="rgba(255,255,255,.55)"/>
+          <path d="M7 12h4M7 15h8" stroke="rgba(255,255,255,.7)" stroke-linecap="round"/>
+        </svg>`);
+                case "calidad":
+                    return base("Calidad: devoluciones / scrap", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z" stroke="rgba(255,255,255,.8)"/>
+          <path d="M8 12l2.5 2.5L16 9" stroke="rgba(255,255,255,.75)" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`);
+                case "finanzas":
+                    return base("Finanzas: caja / cierres / multas", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="7" width="16" height="12" rx="2" stroke="rgba(255,255,255,.8)"/>
+          <path d="M8 11h8M8 15h5" stroke="rgba(255,255,255,.7)" stroke-linecap="round"/>
+          <circle cx="17" cy="13" r="1.5" fill="rgba(255,255,255,.65)"/>
+        </svg>`);
+                case "ventas":
+                    return base("Ventas/Cliente: fuga de ingresos", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M5 16l5-5 3 3 6-7" stroke="rgba(255,255,255,.8)" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M19 7h-4" stroke="rgba(255,255,255,.6)" stroke-linecap="round"/>
+          <path d="M5 19h14" stroke="rgba(255,255,255,.45)" stroke-linecap="round"/>
+        </svg>`);
+                case "compras":
+                    return base("Compras: proveedores / costos", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M7 7h14l-2 10H9L7 7z" stroke="rgba(255,255,255,.8)" stroke-linejoin="round"/>
+          <path d="M7 7L6 4H3" stroke="rgba(255,255,255,.6)" stroke-linecap="round"/>
+          <circle cx="10" cy="20" r="1.5" fill="rgba(255,255,255,.65)"/>
+          <circle cx="18" cy="20" r="1.5" fill="rgba(255,255,255,.65)"/>
+        </svg>`);
+                case "produccion":
+                    return base("Producción: planificación / atraso", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M4 16h16" stroke="rgba(255,255,255,.55)" stroke-linecap="round"/>
+          <path d="M6 16V9l4-3 4 3v7" stroke="rgba(255,255,255,.8)" stroke-linejoin="round"/>
+          <path d="M14 12h4v4h-4z" stroke="rgba(255,255,255,.65)"/>
+        </svg>`);
+                case "rrhh":
+                    return base("RRHH: rotación / nómina", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <circle cx="9" cy="9" r="3" stroke="rgba(255,255,255,.8)"/>
+          <path d="M4 20c1-4 10-4 11 0" stroke="rgba(255,255,255,.7)" stroke-linecap="round"/>
+          <path d="M17 8v6M14 11h6" stroke="rgba(255,255,255,.55)" stroke-linecap="round"/>
+        </svg>`);
+                case "mantenimiento":
+                    return base("Mantenimiento: paros / activos", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M14 7l3-3 3 3-3 3-3-3z" stroke="rgba(255,255,255,.75)"/>
+          <path d="M10 14l4-4 4 4-4 4-4-4z" stroke="rgba(255,255,255,.8)"/>
+          <path d="M2 22l7-7" stroke="rgba(255,255,255,.55)" stroke-linecap="round"/>
+        </svg>`);
+                case "bi":
+                    return base("BI: decisiones / KPIs", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M4 19V5" stroke="rgba(255,255,255,.55)" stroke-linecap="round"/>
+          <path d="M4 19h16" stroke="rgba(255,255,255,.55)" stroke-linecap="round"/>
+          <path d="M8 17V12M12 17V9M16 17V14" stroke="rgba(255,255,255,.8)" stroke-linecap="round"/>
+        </svg>`);
+                case "cumplimiento":
+                    return base("Cumplimiento: auditoría / normatividad", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M7 4h10v16H7z" stroke="rgba(255,255,255,.8)"/>
+          <path d="M9 8h6M9 12h6M9 16h4" stroke="rgba(255,255,255,.65)" stroke-linecap="round"/>
+        </svg>`);
+                case "operacion":
+                    return base("Operación: fricción / variabilidad", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M4 12h6l2-3 3 6 2-3h3" stroke="rgba(255,255,255,.8)" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`);
+                case "cliente":
+                    return base("Cliente: nivel de servicio", `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 5.5-7 10-7 10z" stroke="rgba(255,255,255,.8)"/>
+        </svg>`);
+                default:
+                    return base("Señal", `<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="8" stroke="rgba(255,255,255,.7)"/>
+        <path d="M12 8v5" stroke="rgba(255,255,255,.7)" stroke-linecap="round"/>
+        <circle cx="12" cy="16.5" r="1" fill="rgba(255,255,255,.7)"/>
+      </svg>`);
+            }
+        }
+
+        function describeSignalsShort(signals) {
+            // Texto corto, con nombres compactos
+            const map = {
+                inventario: "Inventario", calidad: "Calidad", finanzas: "Finanzas",
+                ventas: "Ventas", compras: "Compras", produccion: "Producción",
+                rrhh: "RRHH", mantenimiento: "Mantenimiento", bi: "BI", cumplimiento: "Cumplimiento",
+                operacion: "Operación", cliente: "Cliente",
+            };
+            return signals.map(s => map[s] || s).slice(0, 4).join(" · ");
+        }
+
+        /* ---------- Render principal ---------- */
+
+        function renderAll() {
+            // Header text
+            el.companyTitle.textContent = state.companyName + " · Consultor ERP";
+            el.industryChip.textContent = state.industry.name;
+            el.sizeChip.textContent = state.size.name;
+            el.painsChip.textContent = "Señales: " + describeSignalsShort(state.pains);
+
+            el.objectiveChip.textContent = state.bankrupt ? "Estado: Quiebra" : (state.finished ? "Estado: Finalizado" : "Estado: En curso");
+
+            // Timeline
+            renderTimeline();
+
+            // Modules
+            renderModules();
+
+            // Map
+            renderRiskMap(el.riskMap);
+
+            // KPIs
+            updateKPIs();
+
+            // Buttons
+            el.btnCloseMonth.disabled = state.finished || state.bankrupt;
+            el.btnReport.disabled = !(state.finished || state.bankrupt);
+        }
+
+        function renderTimeline() {
+            el.timeline.innerHTML = "";
+            for (let m = 1; m <= 12; m++) {
+                const seg = document.createElement("div");
+                seg.className = "mseg";
+                if (m < state.month) seg.classList.add("done");
+                if (m === state.month && !state.finished && !state.bankrupt) seg.classList.add("current");
+                seg.title = "Mes " + m;
+                el.timeline.appendChild(seg);
+            }
+        }
+
+        /* ---------- Módulos: render + acciones ---------- */
+
+        function monthlyBurn() {
+            let burn = 0;
+            for (const m of MODULES) {
+                const st = state.modules[m.id].status;
+                if (st === "impl" || st === "live") burn += state.moduleCosts[m.id].monthly;
+            }
+            return burn;
+        }
+
+        function renderModules() {
+            el.monthlyBurn.textContent = "Mensual: " + fmtMoney(monthlyBurn());
+
+            el.modules.innerHTML = "";
+            for (const m of MODULES) {
+                const st = state.modules[m.id];
+                const cost = state.moduleCosts[m.id];
+
+                const card = document.createElement("div");
+                card.className = "mod";
+
+                const top = document.createElement("div");
+                top.className = "modTop";
+
+                const left = document.createElement("div");
+                const name = document.createElement("div");
+                name.className = "modName";
+                name.textContent = m.name;
+                const meta = document.createElement("div");
+                meta.className = "modMeta";
+                meta.innerHTML = `
+      <span class="chip" title="Implementación (una sola vez)">Setup: ${fmtMoney(cost.setup)}</span>
+      <span class="chip" title="Costo mensual activo">Mes: ${fmtMoney(cost.monthly)}</span>
+    `;
+                left.appendChild(name);
+                left.appendChild(meta);
+
+                const status = document.createElement("div");
+                status.className = "status";
+                const dot = document.createElement("i");
+
+                let statusText = "No instalado";
+                if (st.status === "none") { dot.style.background = "var(--bad)"; statusText = "No instalado"; }
+                if (st.status === "impl") { dot.style.background = "var(--warn)"; statusText = "Implementando"; }
+                if (st.status === "live") { dot.style.background = "var(--good)"; statusText = "Activo"; }
+                status.appendChild(dot);
+                status.appendChild(document.createTextNode(statusText));
+                status.title = m.hint;
+
+                top.appendChild(left);
+                top.appendChild(status);
+
+                const impact = document.createElement("div");
+                impact.className = "impact";
+                impact.appendChild(makeImpactTag(m.effect));
+                // necesidad (pista cuantitativa) sin texto largo
+                const need = Math.round(state.needs[m.id] * 100);
+                const tagNeed = document.createElement("span");
+                tagNeed.className = "tag";
+                tagNeed.title = "Necesidad del caso (peso procedural)";
+                tagNeed.innerHTML = `<span class="dot" style="background:rgba(255,255,255,.25)"></span>Need ${need}`;
+                impact.appendChild(tagNeed);
+
+                const actions = document.createElement("div");
+                actions.className = "modActions";
+
+                const btn = document.createElement("button");
+                btn.className = "btn primary";
+                btn.textContent = st.status === "none" ? "Implementar" : (st.status === "impl" ? "En curso" : "Activo");
+                btn.disabled = st.status !== "none" || state.finished || state.bankrupt;
+
+                // Validación de caja
+                const canPay = state.cash >= cost.setup;
+                if (!canPay) btn.disabled = true;
+                btn.title = canPay ? "Paga setup hoy. Beneficios desde el próximo mes." : "Caja insuficiente para setup.";
+
+                btn.addEventListener("click", () => {
+                    startModuleImplementation(m.id);
+                });
+
+                const note = document.createElement("div");
+                note.className = "tiny";
+                note.textContent = st.status === "impl" ? ("Go-live: mes " + (st.liveMonth)) : "";
+
+                actions.appendChild(btn);
+                actions.appendChild(note);
+
+                card.appendChild(top);
+                card.appendChild(impact);
+                card.appendChild(actions);
+
+                el.modules.appendChild(card);
+            }
+        }
+
+        function makeImpactTag(effect) {
+            // Un tag compacto: +$ / -$ / -R
+            let t = [];
+            if (effect.revenue) t.push(effect.revenue > 0 ? `+Rev` : `-Rev`);
+            if (effect.cogs) t.push(effect.cogs < 0 ? `-COGS` : `+COGS`);
+            if (effect.overhead) t.push(effect.overhead < 0 ? `-OH` : `+OH`);
+            const riskKeys = effect.risk ? Object.keys(effect.risk).length : 0;
+            if (riskKeys) t.push(`-Riesgo`);
+
+            const s = document.createElement("span");
+            s.className = "tag";
+            s.title = "Impacto esperado (simplificado)";
+            s.innerHTML = `<span class="dot" style="background:rgba(43,228,167,.25)"></span>${t.join(" · ") || "Impacto"}`;
+            return s;
+        }
+
+        function startModuleImplementation(moduleId) {
+            const st = state.modules[moduleId];
+            const cost = state.moduleCosts[moduleId];
+            if (st.status !== "none") return;
+            if (state.cash < cost.setup) return;
+
+            state.cash -= cost.setup;
+            state.modules[moduleId] = {
+                status: "impl",
+                startedMonth: state.month,
+                liveMonth: state.month + 1,
+                adoption: 0
+            };
+
+            // Log corto
+            pushLog(`Implementación: ${shortModuleName(moduleId)}`, "Setup pagado");
+            renderAll();
+        }
+
+        function shortModuleName(id) {
+            const m = MODULES.find(x => x.id === id);
+            return m ? m.name.split("/")[0].trim() : id;
+        }
+
+        function pushLog(title, line) {
+            el.eventTitle.textContent = title;
+            el.eventTag.textContent = state.bankrupt ? "⚠" : "•";
+            state.logLines = [line || "—", state.logLines[0] || "—"];
+            el.eventLine1.textContent = state.logLines[0];
+            el.eventLine2.textContent = state.logLines[1];
+        }
+
+        /* ---------- Mapa de riesgos (SVG) ---------- */
+
+        function renderRiskMap(targetSvg) {
+            targetSvg.innerHTML = "";
+
+            // Fondo "plano técnico": grid
+            const defs = svgEl("defs");
+            const pattern = svgEl("pattern", { id: "grid", width: "40", height: "40", patternUnits: "userSpaceOnUse" });
+            pattern.appendChild(svgEl("path", { d: "M 40 0 L 0 0 0 40", fill: "none", stroke: "rgba(255,255,255,.07)", "stroke-width": "1" }));
+            defs.appendChild(pattern);
+
+            const glow = svgEl("filter", { id: "glow", x: "-50%", y: "-50%", width: "200%", height: "200%" });
+            glow.appendChild(svgEl("feGaussianBlur", { "stdDeviation": "2.5", result: "coloredBlur" }));
+            const merge = svgEl("feMerge");
+            merge.appendChild(svgEl("feMergeNode", { "in": "coloredBlur" }));
+            merge.appendChild(svgEl("feMergeNode", { "in": "SourceGraphic" }));
+            glow.appendChild(merge);
+            defs.appendChild(glow);
+
+            targetSvg.appendChild(defs);
+            targetSvg.appendChild(svgEl("rect", { x: 0, y: 0, width: 1000, height: 640, fill: "url(#grid)" }));
+
+            // Conectores (flow) - estilo blueprint
+            const lines = [
+                ["salesArea", "procArea"], ["procArea", "invArea"], ["invArea", "prodArea"], ["prodArea", "qualArea"],
+                ["salesArea", "finArea"], ["finArea", "biArea"], ["hrArea", "finArea"], ["qualArea", "finArea"],
+                ["prodArea", "maintArea"], ["crmService", "salesArea"], ["invArea", "finArea"], ["salesArea", "invArea"]
+            ];
+            for (const [a, b] of lines) {
+                const na = MAP_NODES.find(n => n.id === a);
+                const nb = MAP_NODES.find(n => n.id === b);
+                if (!na || !nb) continue;
+                const ax = na.x + na.w, ay = na.y + na.h / 2;
+                const bx = nb.x, by = nb.y + nb.h / 2;
+                const midx = (ax + bx) / 2;
+                const path = `M ${ax} ${ay} C ${midx} ${ay}, ${midx} ${by}, ${bx} ${by}`;
+                targetSvg.appendChild(svgEl("path", { d: path, fill: "none", stroke: "rgba(92,200,255,.22)", "stroke-width": "2" }));
+            }
+
+            // Nodes
+            for (const node of MAP_NODES) {
+                const risk = state.nodeRisk[node.id] ?? estimateNodeRisk(node);
+                const heat = riskToAlpha(risk);
+                const group = svgEl("g", { class: "node", "data-node": node.id, style: "cursor:pointer;" });
+
+                // Heat overlay
+                group.appendChild(svgEl("rect", {
+                    x: node.x, y: node.y, width: node.w, height: node.h, rx: 14,
+                    fill: `rgba(255,92,119,${heat})`,
+                    stroke: "rgba(255,255,255,.18)", "stroke-width": "1.2"
+                }));
+
+                // "technical" inner lines
+                group.appendChild(svgEl("rect", {
+                    x: node.x + 10, y: node.y + 10, width: node.w - 20, height: node.h - 20, rx: 10,
+                    fill: "rgba(0,0,0,.10)",
+                    stroke: "rgba(255,255,255,.12)", "stroke-width": "1"
+                }));
+
+                // Label
+                group.appendChild(svgEl("text", {
+                    x: node.x + 16, y: node.y + 26, fill: "rgba(255,255,255,.92)",
+                    "font-size": "15", "font-weight": "800", "letter-spacing": ".2"
+                }, [document.createTextNode(node.label)]));
+
+                // Risk number (compact)
+                group.appendChild(svgEl("text", {
+                    x: node.x + 16, y: node.y + 46, fill: "rgba(255,255,255,.68)",
+                    "font-size": "12"
+                }, [document.createTextNode("R " + Math.round(risk))]));
+
+                // Module status dot
+                const modStatus = state.modules[node.module]?.status || "none";
+                let col = "rgba(255,92,119,.9)";
+                if (modStatus === "impl") col = "rgba(255,209,102,.95)";
+                if (modStatus === "live") col = "rgba(43,228,167,.95)";
+                group.appendChild(svgEl("circle", { cx: node.x + node.w - 18, cy: node.y + 18, r: 7, fill: col, filter: "url(#glow)" }));
+
+                // Small module code (compact)
+                group.appendChild(svgEl("text", {
+                    x: node.x + node.w - 18, y: node.y + 22, fill: "rgba(0,0,0,.60)",
+                    "font-size": "10", "text-anchor": "middle", "font-weight": "900"
+                }, [document.createTextNode(modStatus === "live" ? "✓" : (modStatus === "impl" ? "…" : "×"))]));
+
+                // Pins on this node
+                const pinsHere = state.pins.filter(p => p.nodeId === node.id);
+                let px = node.x + node.w - 22;
+                let py = node.y + node.h - 18;
+                for (const p of pinsHere.slice(-3)) { // mostrar últimos 3 para no saturar
+                    group.appendChild(renderPin(px, py, p.severity, p.typeId));
+                    px -= 18;
+                }
+
+                // Tooltip nativo (mínimo texto)
+                const title = svgEl("title", { textContent: `${node.label} · Riesgo ${Math.round(risk)} · Clic: indicador` });
+                group.appendChild(title);
+
+                group.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    openNodePopover(node, ev);
+                });
+
+                targetSvg.appendChild(group);
+            }
+
+            // Click fuera: cerrar popover
+            if (targetSvg === el.riskMap) {
+                el.riskMap.addEventListener("click", () => {
+                    closePopover();
+                });
+            }
+        }
+
+        function riskToAlpha(r) {
+            // 0..100 -> 0.00..0.35
+            return clamp((r / 100) * 0.35, 0, 0.35);
+        }
+
+        function renderPin(x, y, severity, typeId) {
+            // Pin compacto (círculo + "!")
+            let fill = "rgba(92,200,255,.95)";
+            if (severity === 2) fill = "rgba(255,209,102,.95)";
+            if (severity === 3) fill = "rgba(255,92,119,.95)";
+            const g = svgEl("g");
+            g.appendChild(svgEl("circle", { cx: x, cy: y, r: 7, fill, stroke: "rgba(0,0,0,.35)", "stroke-width": "1" }));
+            g.appendChild(svgEl("text", { x: x, y: y + 4, "text-anchor": "middle", "font-size": "11", "font-weight": "900", fill: "rgba(0,0,0,.65)" },
+                [document.createTextNode("!")]
+            ));
+            const t = RISK_TYPES.find(t => t.id === typeId)?.label || "Riesgo";
+            g.appendChild(svgEl("title", { textContent: `Indicador: ${t} · Sev ${severity}` }));
+            return g;
+        }
+
+        function openNodePopover(node, ev) {
+            if (state.finished || state.bankrupt) {
+                // Aun en reporte, permitir ver y marcar, pero no es crítico
+            }
+
+            const rect = el.riskMap.getBoundingClientRect();
+            const x = ev.clientX - rect.left;
+            const y = ev.clientY - rect.top;
+
+            // Construir popover (texto corto)
+            const risk = Math.round(state.nodeRisk[node.id] ?? estimateNodeRisk(node));
+            const modSt = state.modules[node.module]?.status || "none";
+            const modTxt = (modSt === "live" ? "Activo" : (modSt === "impl" ? "Implementando" : "No instalado"));
+
+            const pop = el.pop;
+            pop.style.display = "block";
+            pop.style.left = clamp(x + 12, 10, rect.width - 240) + "px";
+            pop.style.top = clamp(y + 12, 10, rect.height - 190) + "px";
+
+            // Tipo activo por defecto: por tipo del nodo
+            const defaultType = node.type || "operacion";
+            const existingType = pop.getAttribute("data-type") || defaultType;
+            pop.setAttribute("data-node", node.id);
+            pop.setAttribute("data-type", existingType);
+
+            pop.innerHTML = `
+    <div class="row">
+      <div>
+        <div class="title">${node.label}</div>
+        <div class="mini">Riesgo <b>${risk}</b> · ERP: ${modTxt}</div>
+      </div>
+      <span class="pill">Clic: indicador</span>
+    </div>
+
+    <div class="typeRow" id="typeRow"></div>
+
+    <div class="sevRow">
+      <button class="sevBtn" data-sev="1" title="Severidad 1 (baja)">Sev 1</button>
+      <button class="sevBtn" data-sev="2" title="Severidad 2 (media)">Sev 2</button>
+      <button class="sevBtn" data-sev="3" title="Severidad 3 (alta)">Sev 3</button>
+    </div>
+
+    <div class="footer">
+      <button class="btn" id="btnClearPins" title="Quita indicadores en esta área">Limpiar</button>
+      <button class="btn" id="btnClosePop">Cerrar</button>
+    </div>
+  `;
+
+            const typeRow = pop.querySelector("#typeRow");
+            for (const t of RISK_TYPES) {
+                const b = document.createElement("button");
+                b.className = "typeBtn" + (t.id === existingType ? " active" : "");
+                b.textContent = t.label;
+                b.title = "Tipo: " + t.label;
+                b.addEventListener("click", () => {
+                    pop.setAttribute("data-type", t.id);
+                    for (const bb of typeRow.querySelectorAll(".typeBtn")) bb.classList.remove("active");
+                    b.classList.add("active");
+                });
+                typeRow.appendChild(b);
+            }
+
+            for (const btn of pop.querySelectorAll(".sevBtn")) {
+                btn.addEventListener("click", () => {
+                    const sev = parseInt(btn.getAttribute("data-sev"), 10);
+                    const typeId = pop.getAttribute("data-type") || defaultType;
+                    addPin(node.id, typeId, sev);
+                    closePopover();
+                });
+            }
+
+            pop.querySelector("#btnClosePop").addEventListener("click", closePopover);
+            pop.querySelector("#btnClearPins").addEventListener("click", () => {
+                state.pins = state.pins.filter(p => p.nodeId !== node.id);
+                closePopover();
+                renderAll();
+            });
+        }
+
+        function closePopover() {
+            el.pop.style.display = "none";
+        }
+
+        function addPin(nodeId, typeId, severity) {
+            state.pins.push({ nodeId, typeId, severity, monthPlaced: state.month });
+            // Log mínimo
+            pushLog("Indicador añadido", `${nodeLabel(nodeId)} · ${typeLabel(typeId)} · Sev ${severity}`);
+            renderAll();
+        }
+
+        function nodeLabel(nodeId) {
+            const n = MAP_NODES.find(x => x.id === nodeId);
+            return n ? n.label : nodeId;
+        }
+        function typeLabel(typeId) {
+            const t = RISK_TYPES.find(x => x.id === typeId);
+            return t ? t.label : typeId;
+        }
+
+        /* ---------- Modelo de riesgo/beneficio ---------- */
+
+        function moduleCoverage(moduleId) {
+            const st = state.modules[moduleId];
+            if (!st) return 0;
+
+            // Go-live: al iniciar un mes, si liveMonth <= month, pasa a live
+            if (st.status === "impl" && st.liveMonth <= state.month) {
+                st.status = "live";
+                st.adoption = 0.45; // arranque
+            }
+            if (st.status === "none") return 0;
+
+            // Adopción gradual (live): aumenta con el tiempo, max 1.0
+            if (st.status === "live") {
+                const monthsLive = Math.max(0, state.month - st.liveMonth);
+                // curva suave: 0.45 -> 1.0 en ~3 meses
+                st.adoption = clamp(0.45 + monthsLive * 0.22, 0.45, 1.0);
+                return st.adoption;
+            }
+
+            // Implementando: cobertura parcial (discipline) muy baja
+            if (st.status === "impl") return 0.15;
+            return 0;
+        }
+
+        function estimateNodeRisk(node) {
+            // Riesgo por área deriva de necesidad del módulo + falta de cobertura + fricción base
+            const need = state.needs[node.module] ?? 0.4;
+            const cov = moduleCoverage(node.module); // 0..1
+            const deficit = (1 - cov);
+
+            // Fricción procedural adicional por señales relacionadas
+            let signalBump = 0;
+            if (state.pains.includes("operacion") && node.type === "operacion") signalBump += 0.08;
+            if (state.pains.includes("finanzas") && node.type === "finanzas") signalBump += 0.08;
+            if (state.pains.includes("calidad") && node.type === "calidad") signalBump += 0.10;
+            if (state.pains.includes("cliente") && node.type === "cliente") signalBump += 0.08;
+            if (state.pains.includes("cumplimiento") && node.type === "cumplimiento") signalBump += 0.10;
+
+            // Riesgo (0..100)
+            const r = (need * 0.55 + signalBump) * (0.35 + 0.65 * deficit) * 100;
+            return clamp(r, 0, 100);
+        }
+
+        function computeAllNodeRisk() {
+            const out = {};
+            for (const node of MAP_NODES) {
+                out[node.id] = estimateNodeRisk(node);
+            }
+            state.nodeRisk = out;
+
+            // índice global: promedio ponderado por necesidades del módulo asociado
+            let sum = 0, wsum = 0;
+            for (const node of MAP_NODES) {
+                const w = (state.needs[node.module] ?? 0.4);
+                sum += out[node.id] * w;
+                wsum += w;
+            }
+            state.riskIndex = clamp(sum / (wsum || 1), 0, 100);
+        }
+
+        /* ---------- Simulación mensual ---------- */
+
+        const MONTHS_SHORT = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+
+        function closeMonth() {
+            if (state.finished || state.bankrupt) return;
+
+            // Antes de calcular: actualizar riesgos base del mes
+            computeAllNodeRisk();
+
+            const rng = state.rng;
+
+            // 1) Costos mensuales activos
+            const burn = monthlyBurn();
+
+            // 2) Base + estacionalidad (según industria)
+            const season = state.industry.seasonality || 0.06;
+            const seasonalFactor = 1 + Math.sin((state.month - 1) / 12 * Math.PI * 2) * season;
+
+            let revenue = state.base.revenue * seasonalFactor;
+            let cogs = state.base.cogs * seasonalFactor;
+            let overhead = state.base.overhead;
+
+            // 3) Ineficiencias por déficit (si faltan módulos)
+            //    Se traduce en pérdida de ingreso + aumento de costos
+            let revenueLeak = 0;
+            let costLeak = 0;
+            for (const m of MODULES) {
+                const need = state.needs[m.id];
+                const cov = moduleCoverage(m.id); // 0..1
+                const deficit = (1 - cov);
+
+                // penalización: proporcional a necesidad y déficit
+                revenueLeak += revenue * (need * deficit) * 0.030;   // hasta ~3%*need
+                costLeak += (cogs + overhead) * (need * deficit) * 0.020; // hasta ~2%*need
+            }
+
+            revenue -= revenueLeak;
+            cogs += costLeak * 0.55;
+            overhead += costLeak * 0.45;
+
+            // 4) Beneficios por módulos instalados (en proporción a adopción)
+            for (const m of MODULES) {
+                const cov = moduleCoverage(m.id); // adopción/avance
+                if (cov <= 0) continue;
+
+                if (m.effect.revenue) revenue *= (1 + m.effect.revenue * cov);
+                if (m.effect.cogs) cogs *= (1 + m.effect.cogs * cov); // negativo reduce
+                if (m.effect.overhead) overhead *= (1 + m.effect.overhead * cov);
+            }
+
+            // 5) Evento del mes (procedural)
+            const ev = pick(rng, EVENT_POOL);
+
+            // Modulación del impacto según cobertura en módulos relacionados
+            let relCov = 0;
+            for (const mid of ev.related) {
+                relCov += moduleCoverage(mid);
+            }
+            relCov /= Math.max(1, ev.related.length);
+
+            // Si BI activo, reduce variabilidad (suaviza eventos)
+            const biCov = moduleCoverage("bi");
+            const damp = clamp(1 - (0.22 * biCov), 0.70, 1.0);
+
+            const severity = ev.sev * (1 - 0.55 * relCov) * damp;
+            revenue *= (1 + ev.delta.rev * severity);
+            cogs *= (1 + ev.delta.cogs * severity);
+            overhead *= (1 + ev.delta.oh * severity);
+
+            // 6) Pago de mensualidad
+            overhead += burn;
+
+            // 7) Resultado
+            const profit = revenue - cogs - overhead;
+            state.lastCash = state.cash;
+            state.cash += profit;
+            state.lastProfit = profit;
+
+            // 8) Riesgo: bump por evento + recalcular
+            computeAllNodeRisk();
+            state.riskIndex = clamp(state.riskIndex + ev.risk * severity, 0, 100);
+
+            // 9) Quiebra / fin
+            state.lastEvent = { ...ev, severity };
+            setEventLog(ev, severity, profit, burn, revenueLeak, costLeak);
+
+            if (state.cash <= 0) {
+                state.bankrupt = true;
+                pushLog("Estado: Quiebra", "Caja <= 0");
+                state.cash = Math.min(state.cash, 0);
+                finalizeGame();
+                return;
+            }
+
+            if (state.month >= 12) {
+                state.finished = true;
+                finalizeGame();
+                return;
+            }
+
+            // 10) avanzar mes
+            state.month += 1;
+
+            renderAll();
+        }
+
+        function setEventLog(ev, severity, profit, burn, revLeak, costLeak) {
+            const sevLabel = severity > 0.35 ? "Alto" : (severity > 0.18 ? "Medio" : "Bajo");
+            el.eventTitle.textContent = ev.name;
+            el.eventTag.textContent = `${typeLabel(ev.type)} · ${sevLabel}`;
+            const line1 = `Utilidad: ${fmtMoney(profit)} · Mensual: ${fmtMoney(burn)}`;
+            const line2 = `Fugas: ${fmtMoney(-revLeak)} rev · ${fmtMoney(costLeak)} costos`;
+            el.eventLine1.textContent = line1;
+            el.eventLine2.textContent = line2;
+        }
+
+        /* ---------- KPIs ---------- */
+
+        function updateKPIs() {
+            const m = state.month;
+            el.monthLabel.textContent = `${m} / 12`;
+            el.monthName.textContent = MONTHS_SHORT[(m - 1) % 12];
+            el.yearLabel.textContent = "Año 1";
+            el.monthBar.style.width = (m / 12 * 100).toFixed(1) + "%";
+
+            el.cashValue.textContent = fmtMoney(state.cash);
+            const deltaCash = state.cash - state.lastCash;
+            el.cashDelta.textContent = (deltaCash === 0 ? "" : (deltaCash > 0 ? ("+" + fmtMoney(deltaCash)) : fmtMoney(deltaCash)));
+            el.cashDelta.style.color = deltaCash > 0 ? "var(--good)" : (deltaCash < 0 ? "var(--bad)" : "var(--muted)");
+
+            // cash bar (0..cashStart*1.6)
+            const cashMax = state.cashStart * 1.6;
+            el.cashBar.style.width = (clamp(state.cash / cashMax, 0, 1) * 100).toFixed(1) + "%";
+
+            el.profitValue.textContent = fmtMoney(state.lastProfit);
+            el.profitHint.textContent = state.lastProfit >= 0 ? "▲" : "▼";
+            el.profitHint.style.color = state.lastProfit >= 0 ? "var(--good)" : "var(--bad)";
+
+            // profit bar scaled around base revenue
+            const pScale = state.base.revenue * 0.25;
+            el.profitBar.style.width = (clamp((state.lastProfit + pScale) / (2 * pScale), 0, 1) * 100).toFixed(1) + "%";
+
+            // Risk
+            computeAllNodeRisk();
+            el.riskValue.textContent = Math.round(state.riskIndex);
+            el.riskHint.textContent = state.riskIndex < 35 ? "Bajo" : (state.riskIndex < 65 ? "Medio" : "Alto");
+            el.riskHint.style.color = state.riskIndex < 35 ? "var(--good)" : (state.riskIndex < 65 ? "var(--warn)" : "var(--bad)");
+            el.riskBar.style.width = (clamp(state.riskIndex / 100, 0, 1) * 100).toFixed(1) + "%";
+
+            // Objective
+            el.objectiveChip.textContent = state.bankrupt ? "Quiebra" : (state.finished ? "Finalizado" : "En curso");
+        }
+
+        /* ---------- Reporte final + scoring ---------- */
+
+        function finalizeGame() {
+            // Asegurar actualización de módulos live si aplican
+            for (const m of MODULES) moduleCoverage(m.id);
+            computeAllNodeRisk();
+
+            el.btnReport.disabled = false;
+            el.btnCloseMonth.disabled = true;
+
+            // Abrir reporte automáticamente
+            openReport();
+        }
+
+        function openReport() {
+            // Render data
+            el.rpCompany.textContent = state.companyName + " · " + state.industry.name;
+            const outcome = state.bankrupt ? "Resultado: Quiebra" : "Resultado: Operación sostenida";
+            el.rpOutcome.textContent = outcome;
+
+            const score = computeScore();
+            el.rpScore.textContent = Math.round(score.total);
+
+            el.rpBreakdown.innerHTML = "";
+            for (const row of score.rows) {
+                const d = document.createElement("div");
+                d.className = "brow";
+                d.innerHTML = `<span>${row.label}</span><b>${row.value}</b>`;
+                el.rpBreakdown.appendChild(d);
+            }
+
+            // Render map snapshot in report
+            renderRiskMap(el.reportMap);
+
+            el.reportModal.classList.add("show");
+            el.reportModal.setAttribute("aria-hidden", "false");
+        }
+
+        function computeScore() {
+            // Financiero: base en caja final vs inicial, penaliza quiebra
+            const cashEnd = state.cash;
+            const ratio = (cashEnd - state.cashStart) / Math.max(1, state.cashStart);
+            let financial = clamp((ratio + 0.25) / 0.85, 0, 1) * 100; // ~0 si cae mucho; ~100 si sube bien
+            if (state.bankrupt) financial = 0;
+
+            // Riesgo: promedio inverso
+            const risk = clamp(100 - state.riskIndex, 0, 100);
+
+            // Mapa: ¿marcó los nodos de mayor riesgo?
+            // Top 4 nodos por riesgo y evaluar cobertura de pines en ellos.
+            const entries = Object.entries(state.nodeRisk).map(([k, v]) => ({ id: k, r: v }));
+            entries.sort((a, b) => b.r - a.r);
+            const top = entries.slice(0, 4).map(e => e.id);
+
+            const pinnedNodes = new Set(state.pins.map(p => p.nodeId));
+            let hit = 0;
+            for (const nid of top) if (pinnedNodes.has(nid)) hit += 1;
+            let mapScore = (hit / Math.max(1, top.length)) * 100;
+
+            // Bonus si hay severidades altas en top-2
+            const top2 = new Set(top.slice(0, 2));
+            let bonus = 0;
+            for (const p of state.pins) {
+                if (top2.has(p.nodeId) && p.severity >= 2) bonus += 3.5;
+            }
+            mapScore = clamp(mapScore + bonus, 0, 100);
+
+            // Balance gasto/inversión: penaliza "todo instalado" innecesario o "casi nada"
+            const liveCount = MODULES.filter(m => state.modules[m.id].status === "live").length;
+            const implCount = MODULES.filter(m => state.modules[m.id].status === "impl").length;
+            const installed = liveCount + implCount;
+
+            // "Ideal" aproximado: 4–6 módulos en 12 meses (depende del caso). Usamos needs promedio.
+            const avgNeed = MODULES.reduce((s, m) => s + state.needs[m.id], 0) / MODULES.length;
+            const ideal = clamp(Math.round(3 + avgNeed * 4), 3, 7); // 3..7
+            const dist = Math.abs(installed - ideal);
+            const balance = clamp(100 - dist * 18, 30, 100);
+
+            // Total ponderado
+            const total = 0.45 * financial + 0.30 * risk + 0.15 * mapScore + 0.10 * balance;
+
+            const rows = [
+                { label: "Caja inicial", value: fmtMoney(state.cashStart) },
+                { label: "Caja final", value: fmtMoney(state.cash) },
+                { label: "Módulos instalados", value: `${installed} (ideal ~${ideal})` },
+                { label: "Riesgo final", value: `${Math.round(state.riskIndex)}/100` },
+                { label: "Mapa (top riesgos)", value: `${Math.round(mapScore)}/100` },
+                { label: "Balance gasto/inv.", value: `${Math.round(balance)}/100` },
+                { label: "Financiero", value: `${Math.round(financial)}/100` },
+            ];
+
+            return { total, rows, financial, risk, mapScore, balance };
+        }
+
+        /* ---------- Exportaciones ---------- */
+
+        function exportJSON() {
+            const data = {
+                seed: state.seed,
+                company: state.companyName,
+                industry: state.industry.name,
+                size: state.size.name,
+                pains: state.pains,
+                needs: state.needs,
+                base: state.base,
+                cashStart: state.cashStart,
+                cashEnd: state.cash,
+                monthEnd: state.month,
+                bankrupt: state.bankrupt,
+                modules: state.modules,
+                pins: state.pins,
+                nodeRisk: state.nodeRisk
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `erp_riesgos_${state.seed}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportPNG() {
+            // Convertir el SVG del reporte a PNG usando canvas
+            const svg = el.reportMap;
+            const serializer = new XMLSerializer();
+            const svgStr = serializer.serializeToString(svg);
+
+            const img = new Image();
+            const svgBlob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = 1000;
+                canvas.height = 640;
+                const ctx = canvas.getContext("2d");
+
+                // Fondo (para no depender del CSS externo)
+                ctx.fillStyle = "#0b1220";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.drawImage(img, 0, 0);
+
+                URL.revokeObjectURL(url);
+
+                canvas.toBlob((blob) => {
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `mapa_riesgos_${state.seed}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                }, "image/png");
+            };
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url);
+                alert("No se pudo exportar PNG. Intenta nuevamente.");
+            };
+
+            img.src = url;
+        }
+
+        /* ---------- Arranque / controles ---------- */
+
+        function openIntro() {
+            buildIntroChat();
+            el.introModal.classList.add("show");
+            el.introModal.setAttribute("aria-hidden", "false");
+            el.btnCloseMonth.disabled = true;
+        }
+        function closeIntro() {
+            el.introModal.classList.remove("show");
+            el.introModal.setAttribute("aria-hidden", "true");
+            el.btnCloseMonth.disabled = state.finished || state.bankrupt;
+        }
+
+        function newCase() {
+            const seed = (Date.now() ^ (Math.random() * 0xFFFFFFFF)) >>> 0;
+            generateScenario(seed);
+            renderAll();
+            openIntro();
+        }
+
+        function resetCaseSameSeed() {
+            generateScenario(state.seed);
+            renderAll();
+            openIntro();
+        }
+
+        /* ---------- Eventos UI ---------- */
+
+        el.btnCloseMonth.addEventListener("click", closeMonth);
+        el.btnReset.addEventListener("click", resetCaseSameSeed);
+        el.btnNewCase.addEventListener("click", newCase);
+        el.btnReport.addEventListener("click", openReport);
+
+        el.btnStart.addEventListener("click", () => {
+            closeIntro();
+            el.btnCloseMonth.disabled = false;
+            pushLog("Inicio", "Cierra el mes para simular");
+        });
+        el.btnCancelIntro.addEventListener("click", closeIntro);
+        el.btnRegenerateBrief.addEventListener("click", buildIntroChat);
+
+        el.btnCloseReport.addEventListener("click", () => {
+            el.reportModal.classList.remove("show");
+            el.reportModal.setAttribute("aria-hidden", "true");
+        });
+        el.btnCloseReport2.addEventListener("click", () => {
+            el.reportModal.classList.remove("show");
+            el.reportModal.setAttribute("aria-hidden", "true");
+        });
+
+        el.btnExportJSON.addEventListener("click", exportJSON);
+        el.btnExportPNG.addEventListener("click", exportPNG);
+        el.btnNewFromReport.addEventListener("click", () => {
+            el.reportModal.classList.remove("show");
+            el.reportModal.setAttribute("aria-hidden", "true");
+            newCase();
+        });
+
+        /* Close popover if clicking anywhere else */
+        document.addEventListener("click", (e) => {
+            // evita cerrar si click dentro del popover
+            if (el.pop.style.display === "block") {
+                const inside = el.pop.contains(e.target);
+                if (!inside) closePopover();
+            }
+        });
+
+        /* ---------- Inicialización ---------- */
+
+        (function init() {
+            // Caso inicial procedural
+            newCase();
+
+            // Render inicial del mapa (para layout)
+            renderAll();
+
+            // Instrucción de objetivo compacta
+            el.objectiveChip.title = "Objetivo: sostener 12 meses, maximizar ganancia, marcar riesgos en el mapa.";
+        })();
+    </script>
+</body>
+
+</html>
